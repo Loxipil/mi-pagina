@@ -1,0 +1,17 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "imagenes"
+public_folder: "/imagenes"
+
+collections:
+  - name: "escritos"
+    label: "Escritos"
+    folder: "_escritos"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: "Título", name: "title", widget: "string" }
+      - { label: "Fecha", name: "date", widget: "datetime" }
+      - { label: "Contenido", name: "body", widget: "markdown" }
