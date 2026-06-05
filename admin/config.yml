@@ -1,5 +1,6 @@
 backend:
-  name: git-gateway
+  name: github
+  repo: Loxipil/mi-pagina
   branch: main
 
 media_folder: "imagenes"
