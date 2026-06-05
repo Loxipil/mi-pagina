@@ -1,0 +1,106 @@
+{
+  "adibonanza": [
+    {
+      "pistas": [
+        "Es lo que sucede antes de que el analista hable.",
+        "Vive en el espacio entre dos palabras.",
+        "Sin ella, el discurso no respira."
+      ],
+      "respuesta": "silencio"
+    },
+    {
+      "pistas": [
+        "No es el principio ni el final.",
+        "Es donde algo se rompe para que algo aparezca.",
+        "El análisis la busca sin nombrarla."
+      ],
+      "respuesta": "corte"
+    },
+    {
+      "pistas": [
+        "Se dice sin decirse.",
+        "El cuerpo la conoce antes que la mente.",
+        "Lacan la llamó de otra manera."
+      ],
+      "respuesta": "síntoma"
+    },
+    {
+      "pistas": [
+        "No es amor, aunque se le parece.",
+        "Dirige la escena sin aparecer en ella.",
+        "Mueve al analizante sin que lo sepa."
+      ],
+      "respuesta": "transferencia"
+    },
+    {
+      "pistas": [
+        "Es lo que queda cuando termina la sesión.",
+        "No se archiva, se lleva.",
+        "A veces pesa más que una respuesta."
+      ],
+      "respuesta": "pregunta"
+    }
+  ],
+  "veoveo": [
+    {
+      "acertijo": "3 letras: suena como el mar cuando te llama",
+      "respuesta": "voz"
+    },
+    {
+      "acertijo": "4 letras: lo que el analista sostiene sin hablar",
+      "respuesta": "peso"
+    },
+    {
+      "acertijo": "5 letras: donde todo empieza y nadie recuerda",
+      "respuesta": "sueño"
+    },
+    {
+      "acertijo": "6 letras: la distancia exacta para escuchar",
+      "respuesta": "encuadre"
+    },
+    {
+      "acertijo": "4 letras: lo que se repite sin querer",
+      "respuesta": "rastro"
+    }
+  ],
+  "teoriacuerdas": [
+    { "cuenta": 12, "hoja": 12, "titulo": "El encuadre" },
+    { "cuenta": 7, "hoja": 7, "titulo": "La transferencia" },
+    { "cuenta": 23, "hoja": 23, "titulo": "El síntoma" },
+    { "cuenta": 4, "hoja": 4, "titulo": "El corte" },
+    { "cuenta": 18, "hoja": 18, "titulo": "La escucha" }
+  ],
+  "sopa": {
+    "palabras": ["silencio","encuadre","sintoma","transferencia","escucha","rastro","corte","sueño","analista","paciente","proceso","funcion","objeto","mirada","tiempo"],
+    "tamaño": 14
+  },
+  "calculin": {
+    "numeros": [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 18, 21, 23],
+    "hojas": [
+      { "numero": 4, "titulo": "El corte" },
+      { "numero": 7, "titulo": "La transferencia" },
+      { "numero": 12, "titulo": "El encuadre" },
+      { "numero": 15, "titulo": "El objeto" },
+      { "numero": 18, "titulo": "La escucha" },
+      { "numero": 21, "titulo": "El síntoma" },
+      { "numero": 23, "titulo": "La función" }
+    ]
+  },
+  "oraculo": [
+    "El analista también se pregunta.",
+    "Leer es una forma de ser escuchado.",
+    "El síntoma sabe antes que vos.",
+    "Hay preguntas que solo existen mientras duran.",
+    "El corte no termina: transforma.",
+    "Escuchar es un acto político.",
+    "Lo que no se dice también ocupa lugar.",
+    "El inconsciente no descansa los domingos.",
+    "La transferencia no pide permiso.",
+    "Toda escritura es una forma de análisis.",
+    "El tiempo en análisis no es el mismo tiempo.",
+    "Nombrar algo ya lo cambia.",
+    "Lo que se repite quiere ser escuchado.",
+    "La duda es el comienzo de todo.",
+    "El diván existe aunque no estés acostado."
+  ]
+}
