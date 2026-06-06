@@ -610,3 +610,29 @@
   .sopa-celda { width: 28px; height: 28px; font-size: 0.9rem; }
   .cuerdas-ecuacion { font-size: 1.5rem !important; }
 }
+
+/* --- BOTÓN ENVIAR INLINE --- */
+.panel-input-wrap {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+  margin-top: 1.5rem;
+}
+.panel-input-wrap .panel-input {
+  margin-top: 0;
+  flex: 1;
+}
+.panel-enviar-btn {
+  background: var(--copper);
+  border: none;
+  color: var(--night);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+.panel-enviar-btn:hover { opacity: 0.85; }

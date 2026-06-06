@@ -111,7 +111,10 @@
       <p class="panel-titulo">Adibonanza</p>
       <div id="adi-pistas"></div>
       <button class="panel-pista-btn" id="adi-mas">Otra pista →</button>
-      <input class="panel-input" id="adi-input" type="text" placeholder="Tu respuesta..." autocomplete="off">
+      <div class="panel-input-wrap">
+        <input class="panel-input" id="adi-input" type="text" placeholder="Tu respuesta..." autocomplete="off">
+        <button class="panel-enviar-btn" id="adi-enviar">Enviar →</button>
+      </div>
       <div class="panel-respuesta-error" id="adi-error"></div>
       <div class="panel-respuesta-ok" id="adi-ok"></div>
       <div class="panel-deriva">¿Esta palabra está en el libro? <a href="#libro">Descubrilo.</a></div>
@@ -153,10 +156,12 @@
       }
     }
 
-    inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') verificar(); });
+    inputEl.addEventListener('keyup', e => { if (e.key === 'Enter') verificar(); });
+    inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); verificar(); } });
     inputEl.addEventListener('input', () => {
       if (normalizar(inputEl.value) === normalizar(item.respuesta)) verificar();
     });
+    document.getElementById('adi-enviar').addEventListener('click', verificar);
   }
 
   /* ════════════════════════════════════════
@@ -179,7 +184,10 @@
         `<img src="${img}" alt="" class="veoveo-img">`
       ).join('<span class="veoveo-mas">+</span>')}</div>
       <div class="veoveo-pistas">${item.pista}</div>
-      <input class="panel-input" id="veo-input" type="text" placeholder="Tu respuesta..." autocomplete="off">
+      <div class="panel-input-wrap">
+        <input class="panel-input" id="veo-input" type="text" placeholder="Tu respuesta..." autocomplete="off">
+        <button class="panel-enviar-btn" id="veo-enviar">Enviar →</button>
+      </div>
       <div class="panel-respuesta-error" id="veo-error"></div>
       <div class="panel-respuesta-ok" id="veo-ok"></div>
       <div class="panel-deriva">Este título existe en el libro. <a href="#libro">Ir al libro.</a></div>
@@ -205,10 +213,12 @@
       }
     }
 
-    inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') verificar(); });
+    inputEl.addEventListener('keyup', e => { if (e.key === 'Enter') verificar(); });
+    inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); verificar(); } });
     inputEl.addEventListener('input', () => {
       if (normalizar(inputEl.value) === normalizar(item.respuesta)) verificar();
     });
+    document.getElementById('veo-enviar').addEventListener('click', verificar);
   }
 
   /* ════════════════════════════════════════
@@ -257,7 +267,8 @@
     }
 
     btnConf.addEventListener('click', verificar);
-    inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') verificar(); });
+    inputEl.addEventListener('keyup', e => { if (e.key === 'Enter') verificar(); });
+      inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); verificar(); } });
   }
 
   /* ════════════════════════════════════════
