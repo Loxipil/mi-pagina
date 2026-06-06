@@ -3,12 +3,11 @@
    Pegá esto ANTES del cierre </body>
 ═══════════════════════════════════════════════ */
 
-(function() {
+(function () {
   'use strict';
 
   let DATOS = null;
 
-  // Carga el JSON de datos
   fetch('juegos-data.json')
     .then(r => r.json())
     .then(d => { DATOS = d; })
@@ -18,24 +17,17 @@
   const panelConten = document.getElementById('juego-panel-contenido');
   const btnCerrar   = document.getElementById('juego-cerrar');
 
-  // Click en cards
   document.querySelectorAll('.juego-card').forEach(card => {
-    card.addEventListener('click', () => {
-      const juego = card.dataset.juego;
-      abrirJuego(juego);
-    });
+    card.addEventListener('click', () => abrirJuego(card.dataset.juego));
   });
 
-  // Botones "Jugar"
   document.querySelectorAll('.juego-btn').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
-      const juego = btn.closest('.juego-card').dataset.juego;
-      abrirJuego(juego);
+      abrirJuego(btn.closest('.juego-card').dataset.juego);
     });
   });
 
-  // Cerrar panel
   btnCerrar.addEventListener('click', cerrarPanel);
 
   function cerrarPanel() {
@@ -51,6 +43,7 @@
 
   function abrirJuego(nombre) {
     if (!DATOS) { alert('Cargando datos, intentá de nuevo en un momento.'); return; }
+    trackJuego(nombre);
     switch (nombre) {
       case 'adibonanza':    renderAdibonanza();    break;
       case 'veoveo':        renderVeoVeo();        break;
@@ -60,32 +53,78 @@
     }
   }
 
-  /* ─── ADIBONANZA ─── */
+  /* ── TRACKING SIMPLE (sin GA, solo localStorage) ── */
+  function trackJuego(nombre) {
+    try {
+      const key = 'juegos_stats';
+      const stats = JSON.parse(localStorage.getItem(key) || '{}');
+      stats[nombre] = (stats[nombre] || 0) + 1;
+      localStorage.setItem(key, JSON.stringify(stats));
+    } catch(e) {}
+  }
+
+  /* ── HELPERS ── */
+  function normalizar(s) {
+    return s.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  function errorAleatorio() {
+    const e = DATOS.errores;
+    return e[Math.floor(Math.random() * e.length)];
+  }
+
+  function tituloPorPagina(num) {
+    const hoja = DATOS.calculin.hojas.find(h => h.numero === num);
+    return hoja || null;
+  }
+
+  function personitaHTML() {
+    const acciones = ['bailando', 'pintando', 'escribiendo', 'musica', 'cortando'];
+    const accion = acciones[Math.floor(Math.random() * acciones.length)];
+    return `<div class="personita-wrap"><div class="personita ${accion}" aria-hidden="true">
+      <div class="p-cabeza"></div><div class="p-cuerpo"></div>
+      <div class="p-brazo i"></div><div class="p-brazo d"></div>
+      <div class="p-pierna i"></div><div class="p-pierna d"></div>
+    </div></div>`;
+  }
+
+  function resultadoHojaHTML(numero, titulo) {
+    return `
+      <div class="resultado-hoja visible">
+        <div class="resultado-hoja-numero">${numero}</div>
+        <div class="resultado-hoja-titulo">${titulo}</div>
+        <div class="resultado-hoja-indice">Esa es tu hoja en el libro.</div>
+      </div>
+      ${personitaHTML()}
+    `;
+  }
+
+  /* ════════════════════════════════════════
+     ADIBONANZA
+  ════════════════════════════════════════ */
   function renderAdibonanza() {
     const items = DATOS.adibonanza;
     const item  = items[Math.floor(Math.random() * items.length)];
     let pistaActual = 0;
 
-    const html = `
+    abrirPanel(`
       <p class="panel-titulo">Adibonanza</p>
       <div id="adi-pistas"></div>
       <button class="panel-pista-btn" id="adi-mas">Otra pista →</button>
-      <input class="panel-input" id="adi-input" type="text" placeholder="Tu respuesta...">
+      <input class="panel-input" id="adi-input" type="text" placeholder="Tu respuesta..." autocomplete="off">
+      <div class="panel-respuesta-error" id="adi-error"></div>
       <div class="panel-respuesta-ok" id="adi-ok"></div>
       <div class="panel-deriva">¿Esta palabra está en el libro? <a href="#libro">Descubrilo.</a></div>
-    `;
-    abrirPanel(html);
+    `);
 
     const pistasEl = document.getElementById('adi-pistas');
     const masBtn   = document.getElementById('adi-mas');
     const inputEl  = document.getElementById('adi-input');
     const okEl     = document.getElementById('adi-ok');
+    const errorEl  = document.getElementById('adi-error');
 
     function mostrarPista() {
-      if (pistaActual >= item.pistas.length) {
-        masBtn.style.display = 'none';
-        return;
-      }
+      if (pistaActual >= item.pistas.length) { masBtn.style.display = 'none'; return; }
       const p = document.createElement('div');
       p.className = 'panel-pista';
       p.textContent = item.pistas[pistaActual];
@@ -98,114 +137,143 @@
     mostrarPista();
     masBtn.addEventListener('click', mostrarPista);
 
-    inputEl.addEventListener('input', () => {
-      const val = inputEl.value.trim().toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-      const resp = item.respuesta.toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    function verificar() {
+      const val  = normalizar(inputEl.value);
+      const resp = normalizar(item.respuesta);
+      if (!val) return;
       if (val === resp) {
         okEl.textContent = '✓ ' + item.respuesta.toUpperCase();
         okEl.classList.add('visible');
+        errorEl.classList.remove('visible');
         inputEl.disabled = true;
+      } else {
+        errorEl.textContent = errorAleatorio();
+        errorEl.classList.add('visible');
+        setTimeout(() => errorEl.classList.remove('visible'), 2000);
       }
+    }
+
+    inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') verificar(); });
+    inputEl.addEventListener('input', () => {
+      if (normalizar(inputEl.value) === normalizar(item.respuesta)) verificar();
     });
   }
 
-  /* ─── VEO VEO ─── */
+  /* ════════════════════════════════════════
+     VEO VEO
+  ════════════════════════════════════════ */
   function renderVeoVeo() {
+    if (!DATOS.veoveo || DATOS.veoveo.length === 0) {
+      abrirPanel(`<p class="panel-titulo">Veo Veo</p>
+        <p style="font-family:'DM Sans',sans-serif;color:var(--fog);font-size:0.9rem;">
+          Este juego está en construcción. ¡Volvé pronto!
+        </p>`);
+      return;
+    }
     const items = DATOS.veoveo;
     const item  = items[Math.floor(Math.random() * items.length)];
 
-    const html = `
+    abrirPanel(`
       <p class="panel-titulo">Veo Veo</p>
-      <div class="panel-pista visible" style="font-size:1.4rem;letter-spacing:0.18em;">${item.acertijo}</div>
-      <input class="panel-input" id="veo-input" type="text" placeholder="Tu respuesta...">
+      <div class="veoveo-imagenes">${item.imagenes.map(img =>
+        `<img src="${img}" alt="" class="veoveo-img">`
+      ).join('<span class="veoveo-mas">+</span>')}</div>
+      <div class="veoveo-pistas">${item.pista}</div>
+      <input class="panel-input" id="veo-input" type="text" placeholder="Tu respuesta..." autocomplete="off">
+      <div class="panel-respuesta-error" id="veo-error"></div>
       <div class="panel-respuesta-ok" id="veo-ok"></div>
       <div class="panel-deriva">Este título existe en el libro. <a href="#libro">Ir al libro.</a></div>
-    `;
-    abrirPanel(html);
+    `);
 
     const inputEl = document.getElementById('veo-input');
     const okEl    = document.getElementById('veo-ok');
+    const errorEl = document.getElementById('veo-error');
 
-    inputEl.addEventListener('input', () => {
-      const val  = inputEl.value.trim().toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-      const resp = item.respuesta.toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    function verificar() {
+      const val  = normalizar(inputEl.value);
+      const resp = normalizar(item.respuesta);
+      if (!val) return;
       if (val === resp) {
         okEl.textContent = '✓ ' + item.respuesta.toUpperCase();
         okEl.classList.add('visible');
+        errorEl.classList.remove('visible');
         inputEl.disabled = true;
+      } else {
+        errorEl.textContent = errorAleatorio();
+        errorEl.classList.add('visible');
+        setTimeout(() => errorEl.classList.remove('visible'), 2000);
       }
+    }
+
+    inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') verificar(); });
+    inputEl.addEventListener('input', () => {
+      if (normalizar(inputEl.value) === normalizar(item.respuesta)) verificar();
     });
   }
 
-  /* ─── TEORÍA DE CUERDAS FLOJAS ─── */
+  /* ════════════════════════════════════════
+     TEORÍA DE CUERDAS FLOJAS
+  ════════════════════════════════════════ */
   function renderTeoriaCuerdas() {
-    const items   = DATOS.teoriacuerdas;
-    const item    = items[Math.floor(Math.random() * items.length)];
-    const opciones = generarOpciones(item.cuenta, 4, 1, 50);
+    const items = DATOS.teoriacuerdas;
+    const item  = items[Math.floor(Math.random() * items.length)];
 
-    const botonesHtml = opciones.map(n =>
-      `<button class="calculin-chip" data-val="${n}">${n}</button>`
-    ).join('');
-
-    const html = `
+    abrirPanel(`
       <p class="panel-titulo">Teoría de cuerdas flojas</p>
-      <p style="font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--fog);margin-bottom:1.5rem;">
-        ¿Cuánto da esta cuenta? Elegí el resultado correcto.
-      </p>
-      <div class="panel-pista visible" style="font-size:1.6rem;letter-spacing:0.1em;font-family:'Cormorant Garamond',serif;">
-        ${generarCuentaPara(item.cuenta)}
+      <p class="panel-subtitulo">Despejá la X. La solución es tu página en el libro.</p>
+      <div class="panel-pista visible cuerdas-ecuacion">${item.ecuacion}</div>
+      <div class="cuerdas-input-wrap">
+        <span class="cuerdas-x-label">X =</span>
+        <input class="panel-input cuerdas-input" id="cuerdas-input" type="number" placeholder="?" min="31" max="373">
+        <button class="calculin-igual" id="cuerdas-btn">Confirmar</button>
       </div>
-      <div class="calculin-wrap" style="margin-top:1.5rem;">${botonesHtml}</div>
-      <div class="resultado-hoja" id="cuerdas-result">
-        <div class="resultado-hoja-numero">${item.hoja}</div>
-        <div class="resultado-hoja-titulo">${item.titulo}</div>
-        <div class="resultado-hoja-indice">Esa es tu hoja en el libro.</div>
-      </div>
-      <div class="panel-deriva" style="opacity:0;transition:opacity 0.5s;" id="cuerdas-deriva">
+      <div class="panel-respuesta-error" id="cuerdas-error"></div>
+      <div id="cuerdas-result"></div>
+      <div class="panel-deriva" id="cuerdas-deriva" style="opacity:0;transition:opacity 0.5s;">
         Tu hoja te espera. <a href="#libro">Conocé el libro.</a>
       </div>
-    `;
-    abrirPanel(html);
+    `);
 
-    document.querySelectorAll('.calculin-chip').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const val = parseInt(btn.dataset.val);
-        if (val === item.cuenta) {
-          document.getElementById('cuerdas-result').classList.add('visible');
-          document.getElementById('cuerdas-deriva').style.opacity = '1';
-        } else {
-          btn.style.opacity = '0.3';
-          btn.disabled = true;
-        }
-      });
-    });
-  }
+    const inputEl  = document.getElementById('cuerdas-input');
+    const btnConf  = document.getElementById('cuerdas-btn');
+    const resultEl = document.getElementById('cuerdas-result');
+    const errorEl  = document.getElementById('cuerdas-error');
+    const derivaEl = document.getElementById('cuerdas-deriva');
 
-  function generarCuentaPara(resultado) {
-    const a = Math.floor(Math.random() * (resultado - 1)) + 1;
-    const b = resultado - a;
-    return `${a} + ${b}`;
-  }
-
-  function generarOpciones(correcto, cantidad, min, max) {
-    const set = new Set([correcto]);
-    while (set.size < cantidad) {
-      const rand = Math.floor(Math.random() * (max - min)) + min;
-      if (rand !== correcto) set.add(rand);
+    function verificar() {
+      const val = parseInt(inputEl.value);
+      if (isNaN(val)) return;
+      if (val === item.solucion) {
+        resultEl.innerHTML = resultadoHojaHTML(item.hoja, item.titulo);
+        derivaEl.style.opacity = '1';
+        errorEl.classList.remove('visible');
+        inputEl.disabled = true;
+        btnConf.disabled = true;
+      } else {
+        errorEl.textContent = errorAleatorio();
+        errorEl.classList.add('visible');
+        setTimeout(() => errorEl.classList.remove('visible'), 2000);
+      }
     }
-    return [...set].sort(() => Math.random() - 0.5);
+
+    btnConf.addEventListener('click', verificar);
+    inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') verificar(); });
   }
 
-  /* ─── SOPA CONSCIENTE ─── */
+  /* ════════════════════════════════════════
+     SOPA CONSCIENTE
+  ════════════════════════════════════════ */
   function renderSopa() {
-    const { palabras, tamaño: N } = DATOS.sopa;
-    const grilla = generarSopa(palabras, N);
-    const encontradas = new Set();
+    const todasPalabras = DATOS.sopa.palabras;
+    const porTirada     = DATOS.sopa.palabrasPorTirada || 5;
+    const N             = DATOS.sopa.tamaño || 16;
 
+    // Elegir palabras al azar para esta tirada
+    const shuffled = [...todasPalabras].sort(() => Math.random() - 0.5);
+    const palabras  = shuffled.slice(0, porTirada);
+
+    const grilla     = generarSopa(palabras, N);
+    const encontradas = new Set();
     let seleccion = [];
     let mouseDown = false;
 
@@ -216,24 +284,27 @@
     ).join('');
 
     const palabrasHtml = palabras.map(p =>
-      `<span class="sopa-palabra-item" data-palabra="${p.toLowerCase()}">${p}</span>`
+      `<span class="sopa-palabra-item" data-palabra="${normalizar(p)}">${p}</span>`
     ).join('');
 
-    const html = `
+    abrirPanel(`
       <p class="panel-titulo">Sopa consciente</p>
-      <div class="sopa-grid" id="sopa-grid"
-        style="grid-template-columns:repeat(${N},32px);grid-template-rows:repeat(${N},32px);">
-        ${celdasHtml}
+      <div class="sopa-scroll-wrap">
+        <div class="sopa-grid" id="sopa-grid"
+          style="grid-template-columns:repeat(${N},34px);grid-template-rows:repeat(${N},34px);">
+          ${celdasHtml}
+        </div>
       </div>
       <div class="sopa-palabras-lista">${palabrasHtml}</div>
+      <div id="sopa-completa"></div>
       <div class="panel-deriva" style="margin-top:1.5rem;">
         Estas palabras viven en el libro. <a href="#libro">Ir al libro.</a>
       </div>
-    `;
-    abrirPanel(html);
+    `);
 
     const grid = document.getElementById('sopa-grid');
 
+    // Mouse
     grid.addEventListener('mousedown', e => {
       if (!e.target.classList.contains('sopa-celda')) return;
       mouseDown = true;
@@ -250,38 +321,93 @@
     document.addEventListener('mouseup', () => {
       if (!mouseDown) return;
       mouseDown = false;
-      verificarSopa(seleccion, palabras, encontradas);
+      verificarSopa(seleccion, palabras, encontradas, N);
       seleccion.forEach(c => c.classList.remove('seleccionada'));
       seleccion = [];
+      chequearCompleta(palabras, encontradas);
+    });
+
+    // Touch
+    grid.addEventListener('touchstart', e => {
+      const cel = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+      if (!cel || !cel.classList.contains('sopa-celda')) return;
+      mouseDown = true;
+      seleccion = [cel];
+      cel.classList.add('seleccionada');
+    }, { passive: true });
+    grid.addEventListener('touchmove', e => {
+      if (!mouseDown) return;
+      const cel = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+      if (!cel || !cel.classList.contains('sopa-celda')) return;
+      if (!seleccion.includes(cel)) {
+        seleccion.push(cel);
+        cel.classList.add('seleccionada');
+      }
+    }, { passive: true });
+    grid.addEventListener('touchend', () => {
+      if (!mouseDown) return;
+      mouseDown = false;
+      verificarSopa(seleccion, palabras, encontradas, N);
+      seleccion.forEach(c => c.classList.remove('seleccionada'));
+      seleccion = [];
+      chequearCompleta(palabras, encontradas);
     });
   }
 
-  function verificarSopa(celdas, palabras, encontradas) {
-    const texto = celdas.map(c => c.textContent).join('').toLowerCase();
-    const textoRev = texto.split('').reverse().join('');
+  function chequearCompleta(palabras, encontradas) {
+    const todas = palabras.every(p => encontradas.has(normalizar(p)));
+    if (todas) {
+      const el = document.getElementById('sopa-completa');
+      if (el) {
+        el.innerHTML = `<div class="panel-respuesta-ok visible" style="margin-top:1rem;">
+          ✓ ¡Encontraste todas!</div>${personitaHTML()}`;
+      }
+    }
+  }
+
+  function verificarSopa(celdas, palabras, encontradas, N) {
+    if (celdas.length < 2) return;
+
+    const r0 = parseInt(celdas[0].dataset.r), c0 = parseInt(celdas[0].dataset.c);
+    const r1 = parseInt(celdas[celdas.length-1].dataset.r), c1 = parseInt(celdas[celdas.length-1].dataset.c);
+    const dr = Math.sign(r1 - r0), dc = Math.sign(c1 - c0);
+
+    // Verificar que todas las celdas están en línea recta
+    let enLinea = true;
+    for (let i = 0; i < celdas.length; i++) {
+      const r = parseInt(celdas[i].dataset.r), c = parseInt(celdas[i].dataset.c);
+      if (r !== r0 + dr*i || c !== c0 + dc*i) { enLinea = false; break; }
+    }
+    if (!enLinea) return;
+
+    const texto    = celdas.map(c => c.textContent).join('');
+    const textoNorm = normalizar(texto);
+    const textoRev  = textoNorm.split('').reverse().join('');
+
     palabras.forEach(p => {
-      const pal = p.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-      const t2  = texto.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-      const t2r = textoRev.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-      if ((t2 === pal || t2r === pal) && !encontradas.has(pal)) {
+      const pal = normalizar(p);
+      if ((textoNorm === pal || textoRev === pal) && !encontradas.has(pal)) {
         encontradas.add(pal);
         celdas.forEach(c => { c.classList.remove('seleccionada'); c.classList.add('encontrada'); });
-        const item = document.querySelector(`.sopa-palabra-item[data-palabra="${p.toLowerCase()}"]`);
+        const item = document.querySelector(`.sopa-palabra-item[data-palabra="${pal}"]`);
         if (item) item.classList.add('encontrada');
       }
     });
   }
 
   function generarSopa(palabras, N) {
-    const grid = Array.from({length:N}, () => Array(N).fill(''));
+    const grid = Array.from({ length: N }, () => Array(N).fill(''));
+    // 8 direcciones incluyendo diagonales
     const dirs = [[0,1],[1,0],[1,1],[0,-1],[-1,0],[-1,-1],[1,-1],[-1,1]];
     const letras = 'abcdefghijklmnopqrstuvwxyz';
 
-    palabras.forEach(p => {
-      const pal = p.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-      let colocada = false;
-      let intentos = 0;
-      while (!colocada && intentos < 200) {
+    // Ordenar por longitud descendente para colocar las más largas primero
+    const ordenadas = [...palabras].sort((a, b) => b.length - a.length);
+
+    ordenadas.forEach(p => {
+      const pal = normalizar(p);
+      let colocada = false, intentos = 0;
+      while (!colocada && intentos < 300) {
         intentos++;
         const [dr, dc] = dirs[Math.floor(Math.random() * dirs.length)];
         const r = Math.floor(Math.random() * N);
@@ -301,7 +427,6 @@
       }
     });
 
-    // Relleno con letras random
     for (let r = 0; r < N; r++)
       for (let c = 0; c < N; c++)
         if (grid[r][c] === '') grid[r][c] = letras[Math.floor(Math.random() * letras.length)];
@@ -309,113 +434,104 @@
     return grid;
   }
 
-  /* ─── CALCULÍN ─── */
+  /* ════════════════════════════════════════
+     CALCULÍN
+  ════════════════════════════════════════ */
   function renderCalculin() {
-    const { numeros, hojas } = DATOS.calculin;
-    let num1 = null, op = null, num2 = null;
+    const { digitos, operadores } = DATOS.calculin;
 
-    const numsHtml = numeros.map(n =>
+    const digitosHtml = digitos.map(n =>
       `<button class="calculin-chip" data-val="${n}">${n}</button>`
     ).join('');
-    const opsHtml = ['+','−','×','÷'].map(o =>
+    const opsHtml = operadores.map(o =>
       `<button class="calculin-operador" data-op="${o}">${o}</button>`
     ).join('');
 
-    const html = `
+    abrirPanel(`
       <p class="panel-titulo">Calculín</p>
-      <p style="font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--fog);margin-bottom:1.5rem;">
-        Elegí dos números y un operador. El resultado es tu hoja.
-      </p>
+      <p class="panel-subtitulo">Armá un número de dos cifras y operá. El resultado es tu página.</p>
       <div class="calculin-wrap">
-        <span style="font-family:'DM Sans',sans-serif;font-size:0.75rem;color:var(--fog);letter-spacing:0.1em;">NÚMEROS</span>
-        ${numsHtml}
+        <span class="calculin-label">DÍGITOS</span>
+        ${digitosHtml}
       </div>
       <div class="calculin-wrap" style="margin-top:0.5rem;">
-        <span style="font-family:'DM Sans',sans-serif;font-size:0.75rem;color:var(--fog);letter-spacing:0.1em;">OPERADORES</span>
+        <span class="calculin-label">OPERADORES</span>
         ${opsHtml}
       </div>
-      <div style="margin-top:1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
-        <div class="calculin-display" id="calc-display">?</div>
+      <div class="calculin-constructor" id="calc-constructor">
+        <div class="calculin-display" id="calc-display">_ _</div>
         <button class="calculin-igual" id="calc-igual">= resultado</button>
         <button class="panel-pista-btn" id="calc-reset">Borrar</button>
       </div>
-      <div class="resultado-hoja" id="calc-result"></div>
+      <div id="calc-result"></div>
       <div class="panel-deriva">El azar también es un método. <a href="#libro">Ir al libro.</a></div>
-    `;
-    abrirPanel(html);
+    `);
 
     const display  = document.getElementById('calc-display');
     const btnIgual = document.getElementById('calc-igual');
     const btnReset = document.getElementById('calc-reset');
 
+    // Estado: construimos una expresión libre
+    let expresion = '';
+    let digitosPulsados = 0; // para armar números de dos dígitos
+
     function actualizarDisplay() {
-      const p1 = num1 !== null ? num1 : '?';
-      const p2 = num2 !== null ? num2 : '?';
-      const o  = op  !== null ? op  : '·';
-      display.textContent = `${p1} ${o} ${p2}`;
+      display.textContent = expresion || '_ _';
     }
 
     document.querySelectorAll('.calculin-chip').forEach(btn => {
       btn.addEventListener('click', () => {
-        const val = parseInt(btn.dataset.val);
-        document.querySelectorAll('.calculin-chip').forEach(b => b.classList.remove('activo'));
-        btn.classList.add('activo');
-        if (num1 === null || (num1 !== null && op !== null)) {
-          if (op !== null) { num2 = val; } else { num1 = val; }
-        } else {
-          num1 = val;
-        }
+        const d = btn.dataset.val;
+        expresion += d;
+        digitosPulsados++;
         actualizarDisplay();
       });
     });
 
     document.querySelectorAll('.calculin-operador').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.calculin-operador').forEach(b => b.classList.remove('activo'));
-        btn.classList.add('activo');
-        op = btn.dataset.op;
+        const op = btn.dataset.op;
+        if (expresion === '' || expresion.slice(-1).match(/[+\-×÷]/)) return;
+        expresion += ' ' + op + ' ';
         actualizarDisplay();
       });
     });
 
     btnReset.addEventListener('click', () => {
-      num1 = null; op = null; num2 = null;
+      expresion = '';
+      digitosPulsados = 0;
       document.querySelectorAll('.calculin-chip, .calculin-operador').forEach(b => b.classList.remove('activo'));
       actualizarDisplay();
-      document.getElementById('calc-result').classList.remove('visible');
       document.getElementById('calc-result').innerHTML = '';
     });
 
     btnIgual.addEventListener('click', () => {
-      if (num1 === null || op === null || num2 === null) return;
+      if (!expresion) return;
       let resultado;
-      switch(op) {
-        case '+': resultado = num1 + num2; break;
-        case '−': resultado = num1 - num2; break;
-        case '×': resultado = num1 * num2; break;
-        case '÷': resultado = num2 !== 0 ? Math.round(num1 / num2) : null; break;
-      }
-      if (resultado === null || resultado <= 0) {
-        document.getElementById('calc-result').innerHTML = `
-          <div class="resultado-hoja-titulo">Ese resultado no existe en el libro.</div>
-          <div class="resultado-hoja-indice">Intentá otra combinación.</div>`;
-        document.getElementById('calc-result').classList.add('visible');
+      try {
+        // Reemplazar símbolos para eval
+        const expr = expresion.replace(/×/g, '*').replace(/÷/g, '/');
+        resultado = Math.round(eval(expr));
+      } catch(e) {
+        document.getElementById('calc-result').innerHTML =
+          `<div class="panel-respuesta-error visible">Expresión inválida. Intentá de nuevo.</div>`;
         return;
       }
-      const hoja = hojas.find(h => h.numero === resultado);
+
       const resEl = document.getElementById('calc-result');
-      if (hoja) {
-        resEl.innerHTML = `
-          <div class="resultado-hoja-numero">${hoja.numero}</div>
-          <div class="resultado-hoja-titulo">${hoja.titulo}</div>
-          <div class="resultado-hoja-indice">Esa es tu hoja en el libro.</div>`;
-      } else {
-        resEl.innerHTML = `
-          <div class="resultado-hoja-numero">${resultado}</div>
-          <div class="resultado-hoja-titulo">Hoja ${resultado}</div>
-          <div class="resultado-hoja-indice">Buscá esa página en el libro.</div>`;
+      if (isNaN(resultado) || resultado < 31 || resultado > 373) {
+        resEl.innerHTML = `<div class="resultado-hoja visible">
+          <div class="resultado-hoja-titulo">Ese número está fuera del libro (pág. 31–373).</div>
+          <div class="resultado-hoja-indice">Intentá otra combinación.</div></div>`;
+        return;
       }
-      resEl.classList.add('visible');
+
+      const hoja = tituloPorPagina(resultado);
+      if (hoja) {
+        resEl.innerHTML = resultadoHojaHTML(hoja.numero, hoja.titulo);
+      } else {
+        resEl.innerHTML = resultadoHojaHTML(resultado, 'Hoja ' + resultado);
+      }
     });
   }
 
