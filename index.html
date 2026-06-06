@@ -581,7 +581,11 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
   transition: border-color 0.3s;
 }
 .panel-input:focus { border-color: var(--copper); }
-
+.panel-input-wrap { display: flex; gap: 0.5rem; align-items: stretch; margin-top: 1.5rem; }
+.panel-input-wrap .panel-input { margin-top: 0; flex: 1; }
+.panel-enviar-btn { background: var(--copper); border: none; color: var(--night); font-family: 'DM Sans', sans-serif; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 1.2rem; cursor: pointer; white-space: nowrap; }
+.panel-respuesta-error { font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: #c05050; margin-top: 0.8rem; opacity: 0; transition: opacity 0.3s; min-height: 1.2rem; }
+.panel-respuesta-error.visible { opacity: 1; }
 .panel-enviar-btn {
   background: var(--copper);
   border: none;
@@ -1036,7 +1040,476 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
   </div>
 
 </section>
+<script>
+  if (window.netlifyIdentity) {
+    window.netlifyIdentity.on("init", user => {
+      if (!user) {
+        window.netlifyIdentity.on("login", () => {
+          document.location.href = "/admin/";
+        });
+      }
+    });
+    window.netlifyIdentity.init();
+  }
 
+(function() {
+  'use strict';
+
+  let DATOS = null;
+
+  fetch('juegos-data.json')
+    .then(r => r.json())
+    .then(d => { DATOS = d; })
+    .catch(() => console.warn('No se pudo cargar juegos-data.json'));
+
+  const panel       = document.getElementById('juego-panel');
+  const panelConten = document.getElementById('juego-panel-contenido');
+  const btnCerrar   = document.getElementById('juego-cerrar');
+
+  document.querySelectorAll('.juego-card').forEach(card => {
+    card.addEventListener('click', () => abrirJuego(card.dataset.juego));
+  });
+
+  document.querySelectorAll('.juego-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      abrirJuego(btn.closest('.juego-card').dataset.juego);
+    });
+  });
+
+  btnCerrar.addEventListener('click', cerrarPanel);
+
+  function cerrarPanel() {
+    panel.hidden = true;
+    panelConten.innerHTML = '';
+  }
+
+  function abrirPanel(html) {
+    panelConten.innerHTML = html;
+    panel.hidden = false;
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function abrirJuego(nombre) {
+    if (!DATOS) { alert('Cargando datos, intentá de nuevo en un momento.'); return; }
+    switch (nombre) {
+      case 'adibonanza':    renderAdibonanza();    break;
+      case 'veoveo':        renderVeoVeo();        break;
+      case 'teoriacuerdas': renderTeoriaCuerdas(); break;
+      case 'sopa':          renderSopa();          break;
+      case 'calculin':      renderCalculin();      break;
+    }
+  }
+
+  function normalizar(s) {
+    return s.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  function errorAleatorio() {
+    const e = DATOS.errores;
+    return e[Math.floor(Math.random() * e.length)];
+  }
+
+  function mostrarError(el) {
+    el.textContent = errorAleatorio();
+    el.classList.add('visible');
+    setTimeout(() => el.classList.remove('visible'), 2500);
+  }
+
+  function tituloPorPagina(num) {
+    return DATOS.calculin.hojas.find(h => h.numero === num) || null;
+  }
+
+  function renderAdibonanza() {
+    const items = DATOS.adibonanza;
+    const item  = items[Math.floor(Math.random() * items.length)];
+    let pistaActual = 0;
+
+    abrirPanel(`
+      <p class="panel-titulo">Adibonanza</p>
+      <div id="adi-pistas"></div>
+      <button class="panel-pista-btn" id="adi-mas">Otra pista →</button>
+      <div class="panel-input-wrap">
+        <input class="panel-input" id="adi-input" type="text" placeholder="Tu respuesta..." autocomplete="off">
+        <button class="panel-enviar-btn" id="adi-enviar">Enviar →</button>
+      </div>
+      <div class="panel-respuesta-error" id="adi-error"></div>
+      <div class="panel-respuesta-ok" id="adi-ok"></div>
+      <div class="panel-deriva">¿Esta palabra está en el libro? <a href="#libro">Descubrilo.</a></div>
+    `);
+
+    const pistasEl = document.getElementById('adi-pistas');
+    const masBtn   = document.getElementById('adi-mas');
+    const inputEl  = document.getElementById('adi-input');
+    const okEl     = document.getElementById('adi-ok');
+    const errorEl  = document.getElementById('adi-error');
+
+    function mostrarPista() {
+      if (pistaActual >= item.pistas.length) { masBtn.style.display = 'none'; return; }
+      const p = document.createElement('div');
+      p.className = 'panel-pista';
+      p.textContent = item.pistas[pistaActual];
+      pistasEl.appendChild(p);
+      setTimeout(() => p.classList.add('visible'), 50);
+      pistaActual++;
+      if (pistaActual >= item.pistas.length) masBtn.style.display = 'none';
+    }
+
+    function verificar() {
+      const val = normalizar(inputEl.value);
+      if (!val) return;
+      if (val === normalizar(item.respuesta)) {
+        okEl.textContent = '✓ ' + item.respuesta.toUpperCase();
+        okEl.classList.add('visible');
+        errorEl.classList.remove('visible');
+        inputEl.disabled = true;
+        document.getElementById('adi-enviar').disabled = true;
+      } else {
+        mostrarError(errorEl);
+      }
+    }
+
+    mostrarPista();
+    masBtn.addEventListener('click', mostrarPista);
+    document.getElementById('adi-enviar').addEventListener('click', verificar);
+    inputEl.addEventListener('keyup', e => { if (e.key === 'Enter') verificar(); });
+    inputEl.addEventListener('input', () => {
+      if (normalizar(inputEl.value) === normalizar(item.respuesta)) verificar();
+    });
+  }
+
+  function renderVeoVeo() {
+    if (!DATOS.veoveo || DATOS.veoveo.length === 0) {
+      abrirPanel(`<p class="panel-titulo">Veo Veo</p>
+        <p style="font-family:'DM Sans',sans-serif;color:var(--fog);font-size:0.9rem;">
+          Este juego está en construcción. ¡Volvé pronto!
+        </p>`);
+      return;
+    }
+    const items = DATOS.veoveo;
+    const item  = items[Math.floor(Math.random() * items.length)];
+
+    abrirPanel(`
+      <p class="panel-titulo">Veo Veo</p>
+      <div class="panel-pista visible" style="font-size:1.4rem;letter-spacing:0.18em;">${item.acertijo}</div>
+      <div class="panel-input-wrap">
+        <input class="panel-input" id="veo-input" type="text" placeholder="Tu respuesta..." autocomplete="off">
+        <button class="panel-enviar-btn" id="veo-enviar">Enviar →</button>
+      </div>
+      <div class="panel-respuesta-error" id="veo-error"></div>
+      <div class="panel-respuesta-ok" id="veo-ok"></div>
+      <div class="panel-deriva">Este título existe en el libro. <a href="#libro">Ir al libro.</a></div>
+    `);
+
+    const inputEl = document.getElementById('veo-input');
+    const okEl    = document.getElementById('veo-ok');
+    const errorEl = document.getElementById('veo-error');
+
+    function verificar() {
+      const val = normalizar(inputEl.value);
+      if (!val) return;
+      if (val === normalizar(item.respuesta)) {
+        okEl.textContent = '✓ ' + item.respuesta.toUpperCase();
+        okEl.classList.add('visible');
+        errorEl.classList.remove('visible');
+        inputEl.disabled = true;
+        document.getElementById('veo-enviar').disabled = true;
+      } else {
+        mostrarError(errorEl);
+      }
+    }
+
+    document.getElementById('veo-enviar').addEventListener('click', verificar);
+    inputEl.addEventListener('keyup', e => { if (e.key === 'Enter') verificar(); });
+    inputEl.addEventListener('input', () => {
+      if (normalizar(inputEl.value) === normalizar(item.respuesta)) verificar();
+    });
+  }
+
+  function renderTeoriaCuerdas() {
+    const items = DATOS.teoriacuerdas;
+    const item  = items[Math.floor(Math.random() * items.length)];
+
+    abrirPanel(`
+      <p class="panel-titulo">Teoría de cuerdas flojas</p>
+      <p style="font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--fog);margin-bottom:1.5rem;">
+        Despejá la X. La solución es tu página en el libro.
+      </p>
+      <div class="panel-pista visible cuerdas-ecuacion">${item.ecuacion}</div>
+      <div style="margin-top:1rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+        <span style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--copper);">X =</span>
+        <input class="panel-input" id="cuerdas-input" type="number" placeholder="?" min="31" max="373"
+          style="width:120px;font-size:1.4rem;text-align:center;margin-top:0;">
+        <button class="calculin-igual" id="cuerdas-btn">Confirmar</button>
+      </div>
+      <div class="panel-respuesta-error" id="cuerdas-error"></div>
+      <div id="cuerdas-result"></div>
+      <div class="panel-deriva" id="cuerdas-deriva" style="opacity:0;transition:opacity 0.5s;">
+        Tu hoja te espera. <a href="#libro">Conocé el libro.</a>
+      </div>
+    `);
+
+    const inputEl  = document.getElementById('cuerdas-input');
+    const btnConf  = document.getElementById('cuerdas-btn');
+    const resultEl = document.getElementById('cuerdas-result');
+    const errorEl  = document.getElementById('cuerdas-error');
+
+    function verificar() {
+      const val = parseInt(inputEl.value);
+      if (isNaN(val)) return;
+      if (val === item.solucion) {
+        resultEl.innerHTML = `
+          <div class="resultado-hoja visible">
+            <div class="resultado-hoja-numero">${item.hoja}</div>
+            <div class="resultado-hoja-titulo">${item.titulo}</div>
+            <div class="resultado-hoja-indice">Esa es tu hoja en el libro.</div>
+          </div>`;
+        document.getElementById('cuerdas-deriva').style.opacity = '1';
+        errorEl.classList.remove('visible');
+        inputEl.disabled = true;
+        btnConf.disabled = true;
+      } else {
+        mostrarError(errorEl);
+      }
+    }
+
+    btnConf.addEventListener('click', verificar);
+    inputEl.addEventListener('keyup', e => { if (e.key === 'Enter') verificar(); });
+  }
+
+  function renderSopa() {
+    const todasPalabras = DATOS.sopa.palabras;
+    const porTirada     = DATOS.sopa.palabrasPorTirada || 5;
+    const N             = DATOS.sopa.tamaño || 16;
+
+    const shuffled = [...todasPalabras].sort(() => Math.random() - 0.5);
+    const palabras  = shuffled.slice(0, porTirada);
+
+    const grilla      = generarSopa(palabras, N);
+    const encontradas = new Set();
+    let seleccion = [];
+    let mouseDown = false;
+
+    const celdasHtml = grilla.map((fila, r) =>
+      fila.map((letra, c) =>
+        `<div class="sopa-celda" data-r="${r}" data-c="${c}">${letra}</div>`
+      ).join('')
+    ).join('');
+
+    const palabrasHtml = palabras.map(p =>
+      `<span class="sopa-palabra-item" data-palabra="${normalizar(p)}">${p}</span>`
+    ).join('');
+
+    abrirPanel(`
+      <p class="panel-titulo">Sopa consciente</p>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+        <div class="sopa-grid" id="sopa-grid"
+          style="grid-template-columns:repeat(${N},34px);grid-template-rows:repeat(${N},34px);">
+          ${celdasHtml}
+        </div>
+      </div>
+      <div class="sopa-palabras-lista">${palabrasHtml}</div>
+      <div id="sopa-completa"></div>
+      <div class="panel-deriva" style="margin-top:1.5rem;">
+        Estas palabras viven en el libro. <a href="#libro">Ir al libro.</a>
+      </div>
+    `);
+
+    const grid = document.getElementById('sopa-grid');
+
+    grid.addEventListener('mousedown', e => {
+      if (!e.target.classList.contains('sopa-celda')) return;
+      mouseDown = true; seleccion = [e.target];
+      e.target.classList.add('seleccionada');
+    });
+    grid.addEventListener('mouseover', e => {
+      if (!mouseDown || !e.target.classList.contains('sopa-celda')) return;
+      if (!seleccion.includes(e.target)) { seleccion.push(e.target); e.target.classList.add('seleccionada'); }
+    });
+    document.addEventListener('mouseup', () => {
+      if (!mouseDown) return;
+      mouseDown = false;
+      verificarSopa(seleccion, palabras, encontradas);
+      seleccion.forEach(c => c.classList.remove('seleccionada'));
+      seleccion = [];
+      chequearCompleta(palabras, encontradas);
+    });
+
+    grid.addEventListener('touchstart', e => {
+      const cel = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+      if (!cel || !cel.classList.contains('sopa-celda')) return;
+      mouseDown = true; seleccion = [cel]; cel.classList.add('seleccionada');
+    }, { passive: true });
+    grid.addEventListener('touchmove', e => {
+      if (!mouseDown) return;
+      const cel = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+      if (!cel || !cel.classList.contains('sopa-celda') || seleccion.includes(cel)) return;
+      seleccion.push(cel); cel.classList.add('seleccionada');
+    }, { passive: true });
+    grid.addEventListener('touchend', () => {
+      if (!mouseDown) return;
+      mouseDown = false;
+      verificarSopa(seleccion, palabras, encontradas);
+      seleccion.forEach(c => c.classList.remove('seleccionada'));
+      seleccion = [];
+      chequearCompleta(palabras, encontradas);
+    });
+  }
+
+  function chequearCompleta(palabras, encontradas) {
+    if (palabras.every(p => encontradas.has(normalizar(p)))) {
+      const el = document.getElementById('sopa-completa');
+      if (el) el.innerHTML = `<div class="panel-respuesta-ok visible" style="margin-top:1rem;">✓ ¡Encontraste todas!</div>`;
+    }
+  }
+
+  function verificarSopa(celdas, palabras, encontradas) {
+    if (celdas.length < 2) return;
+    const texto     = celdas.map(c => c.textContent).join('');
+    const textoNorm = normalizar(texto);
+    const textoRev  = textoNorm.split('').reverse().join('');
+    palabras.forEach(p => {
+      const pal = normalizar(p);
+      if ((textoNorm === pal || textoRev === pal) && !encontradas.has(pal)) {
+        encontradas.add(pal);
+        celdas.forEach(c => { c.classList.remove('seleccionada'); c.classList.add('encontrada'); });
+        const item = document.querySelector(`.sopa-palabra-item[data-palabra="${pal}"]`);
+        if (item) item.classList.add('encontrada');
+      }
+    });
+  }
+
+  function generarSopa(palabras, N) {
+    const grid   = Array.from({length:N}, () => Array(N).fill(''));
+    const dirs   = [[0,1],[1,0],[1,1],[0,-1],[-1,0],[-1,-1],[1,-1],[-1,1]];
+    const letras = 'abcdefghijklmnopqrstuvwxyz';
+    const ordenadas = [...palabras].sort((a,b) => b.length - a.length);
+
+    ordenadas.forEach(p => {
+      const pal = normalizar(p);
+      let colocada = false, intentos = 0;
+      while (!colocada && intentos < 300) {
+        intentos++;
+        const [dr, dc] = dirs[Math.floor(Math.random() * dirs.length)];
+        const r = Math.floor(Math.random() * N);
+        const c = Math.floor(Math.random() * N);
+        const endR = r + dr * (pal.length - 1);
+        const endC = c + dc * (pal.length - 1);
+        if (endR < 0 || endR >= N || endC < 0 || endC >= N) continue;
+        let ok = true;
+        for (let i = 0; i < pal.length; i++) {
+          const cr = r+dr*i, cc = c+dc*i;
+          if (grid[cr][cc] !== '' && grid[cr][cc] !== pal[i]) { ok = false; break; }
+        }
+        if (ok) {
+          for (let i = 0; i < pal.length; i++) grid[r+dr*i][c+dc*i] = pal[i];
+          colocada = true;
+        }
+      }
+    });
+
+    for (let r = 0; r < N; r++)
+      for (let c = 0; c < N; c++)
+        if (grid[r][c] === '') grid[r][c] = letras[Math.floor(Math.random() * letras.length)];
+
+    return grid;
+  }
+
+  function renderCalculin() {
+    const { digitos, operadores } = DATOS.calculin;
+
+    const digitosHtml = digitos.map(n =>
+      `<button class="calculin-chip" data-val="${n}">${n}</button>`
+    ).join('');
+    const opsHtml = operadores.map(o =>
+      `<button class="calculin-operador" data-op="${o}">${o}</button>`
+    ).join('');
+
+    abrirPanel(`
+      <p class="panel-titulo">Calculín</p>
+      <p style="font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--fog);margin-bottom:1.5rem;">
+        Armá un número y operá. El resultado es tu página (entre 31 y 373).
+      </p>
+      <div class="calculin-wrap">
+        <span style="font-family:'DM Sans',sans-serif;font-size:0.72rem;color:var(--fog);letter-spacing:0.12em;text-transform:uppercase;width:100%;">DÍGITOS</span>
+        ${digitosHtml}
+      </div>
+      <div class="calculin-wrap" style="margin-top:0.5rem;">
+        <span style="font-family:'DM Sans',sans-serif;font-size:0.72rem;color:var(--fog);letter-spacing:0.12em;text-transform:uppercase;width:100%;">OPERADORES</span>
+        ${opsHtml}
+      </div>
+      <div style="margin-top:1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+        <div class="calculin-display" id="calc-display">_ _</div>
+        <button class="calculin-igual" id="calc-igual">= resultado</button>
+        <button class="panel-pista-btn" id="calc-reset">Borrar</button>
+      </div>
+      <div class="panel-respuesta-error" id="calc-error"></div>
+      <div class="resultado-hoja" id="calc-result"></div>
+      <div class="panel-deriva">El azar también es un método. <a href="#libro">Ir al libro.</a></div>
+    `);
+
+    const display  = document.getElementById('calc-display');
+    const btnIgual = document.getElementById('calc-igual');
+    const btnReset = document.getElementById('calc-reset');
+    const errorEl  = document.getElementById('calc-error');
+    let expresion  = '';
+
+    function actualizarDisplay() { display.textContent = expresion || '_ _'; }
+
+    document.querySelectorAll('.calculin-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        expresion += btn.dataset.val;
+        actualizarDisplay();
+      });
+    });
+
+    document.querySelectorAll('.calculin-operador').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (!expresion || /[+\-×÷]$/.test(expresion.trim())) return;
+        expresion += ' ' + btn.dataset.op + ' ';
+        actualizarDisplay();
+      });
+    });
+
+    btnReset.addEventListener('click', () => {
+      expresion = '';
+      actualizarDisplay();
+      document.getElementById('calc-result').classList.remove('visible');
+      document.getElementById('calc-result').innerHTML = '';
+      errorEl.classList.remove('visible');
+    });
+
+    btnIgual.addEventListener('click', () => {
+      if (!expresion) return;
+      let resultado;
+      try {
+        resultado = Math.round(eval(expresion.replace(/×/g,'*').replace(/÷/g,'/')));
+      } catch(e) {
+        errorEl.textContent = '¡Error! Expresión inválida.';
+        errorEl.classList.add('visible');
+        return;
+      }
+      if (isNaN(resultado) || resultado < 31 || resultado > 373) {
+        errorEl.textContent = 'Ese número está fuera del libro (pág. 31–373). Intentá otra combinación.';
+        errorEl.classList.add('visible');
+        return;
+      }
+      errorEl.classList.remove('visible');
+      const hoja = tituloPorPagina(resultado);
+      const resEl = document.getElementById('calc-result');
+      resEl.innerHTML = hoja
+        ? `<div class="resultado-hoja-numero">${hoja.numero}</div>
+           <div class="resultado-hoja-titulo">${hoja.titulo}</div>
+           <div class="resultado-hoja-indice">Esa es tu hoja en el libro.</div>`
+        : `<div class="resultado-hoja-numero">${resultado}</div>
+           <div class="resultado-hoja-titulo">Hoja ${resultado}</div>
+           <div class="resultado-hoja-indice">Buscá esa página en el libro.</div>`;
+      resEl.classList.add('visible');
+    });
+  }
+
+})();
+</script>
 <section class="podcast" id="podcast" aria-labelledby="podcast-titulo">
 <span class="sub-word" style="left:85.6%;top:67.7%;" data-word="1">repetición</span>
 <span class="sub-word" style="left:91.6%;top:58.9%;" data-word="1">nombre</span>
