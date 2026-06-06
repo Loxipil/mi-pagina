@@ -615,6 +615,40 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
   min-height: 1.2rem;
 }
 .panel-respuesta-error.visible { opacity: 1; }
+.panel-input-wrap {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+  margin-top: 1.5rem;
+}
+.panel-input-wrap .panel-input {
+  margin-top: 0;
+  flex: 1;
+}
+.panel-enviar-btn {
+  background: var(--copper);
+  border: none;
+  color: var(--night);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+.panel-enviar-btn:hover { opacity: 0.85; }
+.panel-respuesta-error {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  color: #c05050;
+  margin-top: 0.8rem;
+  opacity: 0;
+  transition: opacity 0.3s;
+  min-height: 1.2rem;
+}
+.panel-respuesta-error.visible { opacity: 1; }
 .panel-respuesta-ok {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.4rem;
@@ -1596,7 +1630,6 @@ document.querySelectorAll('.reveal, .reveal-slow').forEach(el => observer.observ
     return DATOS.calculin.hojas.find(h => h.numero === num) || null;
   }
 
-  /* ─── ADIBONANZA ─── */
   function renderAdibonanza() {
     const items = DATOS.adibonanza;
     const item  = items[Math.floor(Math.random() * items.length)];
@@ -1655,7 +1688,6 @@ document.querySelectorAll('.reveal, .reveal-slow').forEach(el => observer.observ
     });
   }
 
-  /* ─── VEO VEO ─── */
   function renderVeoVeo() {
     if (!DATOS.veoveo || DATOS.veoveo.length === 0) {
       abrirPanel(`<p class="panel-titulo">Veo Veo</p>
@@ -1704,7 +1736,6 @@ document.querySelectorAll('.reveal, .reveal-slow').forEach(el => observer.observ
     });
   }
 
-  /* ─── TEORÍA DE CUERDAS FLOJAS ─── */
   function renderTeoriaCuerdas() {
     const items = DATOS.teoriacuerdas;
     const item  = items[Math.floor(Math.random() * items.length)];
@@ -1737,7 +1768,6 @@ document.querySelectorAll('.reveal, .reveal-slow').forEach(el => observer.observ
       const val = parseInt(inputEl.value);
       if (isNaN(val)) return;
       if (val === item.solucion) {
-        const hoja = tituloPorPagina(item.hoja);
         resultEl.innerHTML = `
           <div class="resultado-hoja visible">
             <div class="resultado-hoja-numero">${item.hoja}</div>
@@ -1757,7 +1787,6 @@ document.querySelectorAll('.reveal, .reveal-slow').forEach(el => observer.observ
     inputEl.addEventListener('keyup', e => { if (e.key === 'Enter') verificar(); });
   }
 
-  /* ─── SOPA CONSCIENTE ─── */
   function renderSopa() {
     const todasPalabras = DATOS.sopa.palabras;
     const porTirada     = DATOS.sopa.palabrasPorTirada || 5;
@@ -1896,7 +1925,6 @@ document.querySelectorAll('.reveal, .reveal-slow').forEach(el => observer.observ
     return grid;
   }
 
-  /* ─── CALCULÍN ─── */
   function renderCalculin() {
     const { digitos, operadores } = DATOS.calculin;
 
