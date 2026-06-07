@@ -1,0 +1,122 @@
+<section class="contacto" id="contacto" aria-labelledby="contacto-titulo">
+  <p class="section-tag reveal" style="justify-content:center">Contacto</p>
+  <h2 id="contacto-titulo" class="reveal">Escribile a<em>Laura</em></h2>
+  <p class="contacto-sub reveal">Para proyectos, colaboraciones, prensa o para conseguir el libro.</p>
+  <form name="contacto" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="reveal" style="max-width:520px;margin:0 auto 2rem auto;display:flex;flex-direction:column;gap:0.8rem;text-align:left">
+    <input type="hidden" name="form-name" value="contacto">
+    <p style="display:none"><input name="bot-field"></p>
+    <input type="text" name="nombre" placeholder="Tu nombre" required class="email-input" style="width:100%;box-sizing:border-box">
+    <input type="email" name="email" placeholder="Tu correo" required class="email-input" style="width:100%;box-sizing:border-box">
+    <textarea name="mensaje" placeholder="Tu mensaje..." required rows="4" class="email-input" style="width:100%;box-sizing:border-box;resize:vertical;font-family:'DM Sans',sans-serif"></textarea>
+    <button type="submit" class="btn btn-primary" style="cursor:pointer;border:none">Enviar mensaje</button>
+  </form>
+  <div class="contact-links reveal">
+    <a href="https://www.instagram.com/loxicatanzaro/" target="_blank" rel="noopener" class="contact-link">Instagram</a>
+    <a href="https://substack.com/@loxipil" target="_blank" rel="noopener" class="contact-link">Substack</a>
+    <a href="https://open.spotify.com/episode/6TbgkxKKqK11rUdqYQebXF" target="_blank" rel="noopener" class="contact-link">Spotify</a>
+    <a href="https://www.youtube.com/@ArualAura" target="_blank" rel="noopener" class="contact-link">YouTube</a>
+    <a href="https://arual-aura.bandcamp.com/" target="_blank" rel="noopener" class="contact-link">Bandcamp</a>
+    <a href="https://www.youtube.com/@nietacartas" target="_blank" rel="noopener" class="contact-link">Nieta</a>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 Laura Beraldi — Artista Temporal · Literatura Sonora · Sonido &amp; Letras · Buenos Aires</p>
+  <p>PPA · Práctica para Analistas · Arual Aura · Escuela de Expresión en Movimiento sobre Ruedas · @loxipil · @loxicatanzaro</p>
+</footer>
+
+<script>
+const toggle = document.getElementById('navToggle');
+const links = document.getElementById('navLinks');
+toggle.addEventListener('click', () => {
+  links.classList.toggle('open');
+  toggle.textContent = links.classList.contains('open') ? '✕' : '☰';
+});
+function closeNav() {
+  links.classList.remove('open');
+  toggle.textContent = '☰';
+}
+
+// CAROUSEL
+const track = document.getElementById('carouselTrack');
+const nav = document.getElementById('carouselNav');
+const slides = track.querySelectorAll('.carousel-slide');
+let current = 0;
+const total = slides.length;
+slides.forEach((_, i) => {
+  const dot = document.createElement('button');
+  dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+  dot.addEventListener('click', () => goTo(i));
+  nav.appendChild(dot);
+});
+function goTo(n) {
+  current = (n + total) % total;
+  track.style.transform = `translateX(-${current * 100}%)`;
+  nav.querySelectorAll('.carousel-dot').forEach((d, i) => d.classList.toggle('active', i === current));
+}
+document.getElementById('prevBtn').addEventListener('click', () => goTo(current - 1));
+document.getElementById('nextBtn').addEventListener('click', () => goTo(current + 1));
+setInterval(() => goTo(current + 1), 4500);
+let startX = 0;
+track.addEventListener('touchstart', e => startX = e.touches[0].clientX, {passive: true});
+track.addEventListener('touchend', e => {
+  const diff = startX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 40) goTo(current + (diff > 0 ? 1 : -1));
+}, {passive: true});
+
+// REVEAL
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, {threshold: 0.08});
+document.querySelectorAll('.reveal, .reveal-slow').forEach(el => observer.observe(el));
+</script>
+
+<script>
+(function() {
+  var words = document.querySelectorAll('.sub-word');
+  words.forEach(function(el, i) {
+    var seed = i * 137.508;
+    var dur = 8000 + (seed % 22000);        // 8s–30s cycle
+    var delay = (seed * 1.3) % 18000;       // stagger start
+    var startTime = null;
+    var startX = parseFloat(el.style.left) || 0;
+    var startY = parseFloat(el.style.top) || 0;
+
+    // Each word gets its own personality
+    var type = i % 7;
+    var amp = 4 + (i % 8);       // movement amplitude px
+    var rotAmp = (i % 5) - 2;    // rotation amplitude deg
+    var fadeWord = (i % 5 === 0); // 1 in 5 fades
+    var restless = (i % 9 === 0); // 1 in 9 is restless (faster, more movement)
+    if (restless) { dur = 3000 + (seed % 5000); amp = 8 + (i % 12); }
+
+    function animate(ts) {
+      if (!startTime) startTime = ts + delay;
+      var t = (ts - startTime) / dur;
+      var phase = t * Math.PI * 2;
+
+      var tx = 0, ty = 0, rot = 0, op = 0.11;
+
+      if (type === 0) { tx = Math.sin(phase) * amp; ty = Math.cos(phase * 0.7) * amp * 0.6; }
+      else if (type === 1) { tx = Math.sin(phase * 1.3) * amp; ty = Math.sin(phase) * amp; }
+      else if (type === 2) { ty = Math.sin(phase) * amp; rot = Math.sin(phase * 0.5) * rotAmp; }
+      else if (type === 3) { tx = Math.cos(phase * 0.8) * amp * 0.7; ty = Math.sin(phase * 1.2) * amp; rot = Math.cos(phase) * rotAmp; }
+      else if (type === 4) { tx = Math.sin(phase) * amp; rot = Math.sin(phase * 1.5) * (rotAmp * 2); }
+      else if (type === 5) { ty = Math.cos(phase * 0.6) * amp * 1.2; tx = Math.sin(phase * 2) * amp * 0.3; }
+      else { tx = Math.sin(phase * 0.9) * amp; ty = Math.cos(phase * 1.1) * amp; rot = Math.sin(phase * 0.7) * rotAmp; }
+
+      if (fadeWord) {
+        op = 0.06 + Math.sin(phase * 0.5 + Math.PI/4) * 0.055;
+        if (op < 0.005) op = 0.005;
+      }
+
+      el.style.transform = 'translate(' + tx.toFixed(1) + 'px,' + ty.toFixed(1) + 'px) rotate(' + rot.toFixed(2) + 'deg)';
+      if (fadeWord) el.style.opacity = op.toFixed(3);
+
+      requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(animate);
+  });
+})();
+</script>
