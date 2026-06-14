@@ -636,3 +636,245 @@
   transition: opacity 0.2s;
 }
 .panel-enviar-btn:hover { opacity: 0.85; }
+
+/* ═══════════════════════════════════════════════
+   MASCOTAS ANIMADAS
+═══════════════════════════════════════════════ */
+
+/* --- HADITA --- */
+#hadita {
+  position: fixed;
+  top: 0; left: 0;
+  width: 80px;
+  height: 80px;
+  pointer-events: none;
+  z-index: 9999;
+  will-change: transform;
+}
+.hadita-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(249,212,232,0.6));
+  animation: haditaFlota 3s ease-in-out infinite alternate;
+}
+@keyframes haditaFlota {
+  from { transform: translateY(0) rotate(-5deg); }
+  to   { transform: translateY(-8px) rotate(5deg); }
+}
+.hadita-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* --- GLOBO DE DIÁLOGO BASE --- */
+.mascota-globo {
+  position: absolute;
+  background: #fff;
+  color: #222;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.3;
+  padding: 0.6rem 0.9rem;
+  border-radius: 12px;
+  border: 2px solid #222;
+  max-width: 180px;
+  text-align: center;
+  box-shadow: 3px 3px 0 #222;
+  white-space: normal;
+}
+.mascota-globo::after {
+  content: '';
+  position: absolute;
+  border: 8px solid transparent;
+}
+
+/* --- FREUD BASE --- */
+.mascota-freud {
+  position: fixed;
+  z-index: 9990;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+  transition: bottom 0.5s cubic-bezier(.36,.07,.19,.97),
+              right 0.5s cubic-bezier(.36,.07,.19,.97),
+              left 0.5s cubic-bezier(.36,.07,.19,.97);
+}
+
+.mascota-img-freud {
+  width: 160px;
+  mix-blend-mode: screen;
+  filter: brightness(1.1) contrast(1.1);
+}
+
+/* Freud 3, 4, 6, 7 — entran desde abajo al centro */
+.mascota-freud.freud-centro {
+  bottom: -300px;
+  left: 50%;
+  transform: translateX(-50%);
+  align-items: center;
+}
+.mascota-freud.freud-centro.visible { bottom: 0; }
+.mascota-freud.freud-centro .mascota-globo-freud {
+  bottom: 170px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.mascota-freud.freud-centro .mascota-globo-freud::after {
+  bottom: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-top-color: #222;
+}
+
+/* Freud 5 — entra desde la derecha */
+.mascota-freud.freud-derecha {
+  right: -300px;
+  bottom: 2rem;
+  align-items: flex-end;
+  transition: right 0.5s cubic-bezier(.36,.07,.19,.97);
+}
+.mascota-freud.freud-derecha.visible { right: 0; }
+.mascota-freud.freud-derecha .mascota-globo-freud {
+  bottom: 200px;
+  right: 10px;
+}
+.mascota-freud.freud-derecha .mascota-globo-freud::after {
+  bottom: -16px;
+  right: 20px;
+  border-top-color: #222;
+}
+
+/* Freud 8 (acierto) — entra desde la izquierda */
+.mascota-freud.freud-izquierda {
+  left: -300px;
+  bottom: 2rem;
+  align-items: flex-start;
+  transition: left 0.5s cubic-bezier(.36,.07,.19,.97);
+}
+.mascota-freud.freud-izquierda.visible { left: 0; }
+.mascota-freud.freud-izquierda .mascota-globo-freud {
+  bottom: 200px;
+  left: 10px;
+}
+.mascota-freud.freud-izquierda .mascota-globo-freud::after {
+  bottom: -16px;
+  left: 20px;
+  border-top-color: #222;
+}
+
+.mascota-globo-freud {
+  position: absolute;
+}
+
+/* --- PAYASITA DE LA MANO (1.png) — abajo izquierda --- */
+.mascota-payasita1 {
+  position: fixed;
+  bottom: -400px;
+  left: 0;
+  z-index: 9990;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: bottom 0.5s cubic-bezier(.36,.07,.19,.97);
+  pointer-events: none;
+}
+.mascota-payasita1.visible { bottom: 0; }
+
+.mascota-img-payasita1 {
+  width: 200px;
+  mix-blend-mode: screen;
+}
+
+.mascota-globo-payasita1 {
+  position: absolute;
+  bottom: 280px;
+  left: 10px;
+}
+.mascota-globo-payasita1::after {
+  bottom: -16px;
+  left: 20px;
+  border-top-color: #222;
+}
+
+/* --- PAYASITA QUE SE ASOMA (2.png) — desde la derecha --- */
+.mascota-payasita2 {
+  position: fixed;
+  right: -400px;
+  bottom: 0;
+  z-index: 9990;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  transition: right 0.5s cubic-bezier(.36,.07,.19,.97);
+  pointer-events: none;
+}
+.mascota-payasita2.visible { right: 0; }
+
+.mascota-img-payasita2 {
+  width: 260px;
+  mix-blend-mode: screen;
+}
+
+.mascota-globo-payasita2 {
+  position: absolute;
+  bottom: 320px;
+  right: 10px;
+}
+.mascota-globo-payasita2::after {
+  bottom: -16px;
+  right: 20px;
+  border-top-color: #222;
+}
+
+/* --- HOMBRE GATO — abajo centro --- */
+.mascota-hombregato {
+  position: fixed;
+  bottom: -300px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9990;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: bottom 0.5s cubic-bezier(.36,.07,.19,.97);
+  pointer-events: none;
+}
+.mascota-hombregato.visible {
+  bottom: 1rem;
+  animation: gatoFiesta 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes gatoFiesta {
+  from { transform: translateX(-50%) rotate(-4deg) scale(1); }
+  to   { transform: translateX(-50%) rotate(4deg) scale(1.05); }
+}
+
+.mascota-img-gato {
+  width: 140px;
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 16px rgba(184,120,74,0.5));
+}
+
+.mascota-globo-gato {
+  position: absolute;
+  bottom: 160px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a2e;
+  color: var(--copper, #b8784a);
+  border-color: var(--copper, #b8784a);
+  box-shadow: 3px 3px 0 var(--copper, #b8784a);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+.mascota-globo-gato::after {
+  bottom: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-top-color: var(--copper, #b8784a);
+}

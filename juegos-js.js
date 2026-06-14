@@ -33,12 +33,14 @@
   function cerrarPanel() {
     panel.hidden = true;
     panelConten.innerHTML = '';
+    limpiarMascotas();
   }
 
   function abrirPanel(html) {
     panelConten.innerHTML = html;
     panel.hidden = false;
     panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    iniciarTimerPayasita();
   }
 
   function abrirJuego(nombre) {
@@ -53,7 +55,7 @@
     }
   }
 
-  /* ── TRACKING SIMPLE (sin GA, solo localStorage) ── */
+  /* ── TRACKING SIMPLE ── */
   function trackJuego(nombre) {
     try {
       const key = 'juegos_stats';
@@ -98,6 +100,240 @@
       ${personitaHTML()}
     `;
   }
+
+  /* ════════════════════════════════════════
+     MASCOTAS
+  ════════════════════════════════════════ */
+
+  /* -- TIMER PAYASITA QUE SE ASOMA (2.png) -- */
+  let timerPayasita = null;
+
+  const FRASES_PAYASITA2 = [
+    'Hay alguien ahí?', 'Que onda?', 'Todo bien?', 'Que tul?',
+    'Que pasaindú?', 'Que talqui?', 'Te fuiste?', 'Dale gas',
+    'Vamoarriba', 'Mandale play', 'Matecito?'
+  ];
+
+  function iniciarTimerPayasita() {
+    limpiarTimerPayasita();
+    timerPayasita = setTimeout(() => mostrarPayasita2(), 20000); // 20 segundos
+  }
+
+  function resetearTimerPayasita() {
+    iniciarTimerPayasita();
+  }
+
+  function limpiarTimerPayasita() {
+    if (timerPayasita) { clearTimeout(timerPayasita); timerPayasita = null; }
+    const vieja = document.getElementById('mascota-payasita2');
+    if (vieja) vieja.remove();
+  }
+
+  function mostrarPayasita2() {
+    const vieja = document.getElementById('mascota-payasita2');
+    if (vieja) vieja.remove();
+    const frase = FRASES_PAYASITA2[Math.floor(Math.random() * FRASES_PAYASITA2.length)];
+    const el = document.createElement('div');
+    el.id = 'mascota-payasita2';
+    el.className = 'mascota-payasita2';
+    el.innerHTML = `
+      <div class="mascota-globo mascota-globo-payasita2">${frase}</div>
+      <img src="imagenespaginalau/animacionesokcomp/2.webp" alt="payasita" class="mascota-img-payasita2">
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => el.classList.add('visible'), 50);
+    setTimeout(() => {
+      el.classList.remove('visible');
+      setTimeout(() => el.remove(), 600);
+      resetearTimerPayasita();
+    }, 4000);
+  }
+
+  function limpiarMascotas() {
+    limpiarTimerPayasita();
+    ['mascota-payasita2', 'mascota-freud', 'mascota-payasita1', 'mascota-hombregato'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.remove();
+    });
+  }
+
+  /* -- PAYASITA DE LA MANO (1.png) -- */
+  const FRASES_PAYASITA1 = [
+    'dale y againnnn', 'Pasame la repeee', 'No estuvo bien eso',
+    'Otra vez!', 'Auch!', 'Probá de nuevo!', 'Next!', 'Ayyyy no no'
+  ];
+
+  function mostrarPayasita1() {
+    resetearTimerPayasita();
+    const vieja = document.getElementById('mascota-payasita1');
+    if (vieja) vieja.remove();
+    const frase = FRASES_PAYASITA1[Math.floor(Math.random() * FRASES_PAYASITA1.length)];
+    const el = document.createElement('div');
+    el.id = 'mascota-payasita1';
+    el.className = 'mascota-payasita1';
+    el.innerHTML = `
+      <img src="imagenespaginalau/animacionesokcomp/1.webp" alt="payasita" class="mascota-img-payasita1">
+      <div class="mascota-globo mascota-globo-payasita1">${frase}</div>
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => el.classList.add('visible'), 50);
+    setTimeout(() => {
+      el.classList.remove('visible');
+      setTimeout(() => el.remove(), 600);
+    }, 3500);
+  }
+
+  /* -- FREUD -- */
+  const FREUD_ERRORES = [
+    { img: '3.png', frases: ['Mira como te miro.', 'Yo no lo sé. Al parecer tú tampoco.', '¿Acaso has soñado con este acierto que falta?'] },
+    { img: '4.png', frases: ['Anotaré en mi cuaderno: Resistencia', 'Tú no lo sabes. Tu inconsciente sí.'] },
+    { img: '5.png', frases: ['Oh, es incorrecto. ¿Has pensado en tu padre?', 'Ah, con que ¿te resistes?'] },
+    { img: '6.png', frases: ['Eso está muy mal ¿cómo te sientes al respecto?', 'Por aquí debe estar esta equivocación repetida'] },
+    { img: '7.png', frases: ['Perfecto, tu madre.', 'Has perdido. ¿Cómo te sientes?', 'Este impulso por el desacierto ¿de dónde intuyes que viene?'] },
+  ];
+
+  const FREUD_ACIERTOS = {
+    img: '8.png',
+    frases: ['¡Hurra! ¿A que te recuerda?', '¡Felicidades! Gocemos', '¡Muy bien! ¿Cómo se siente la victoria?', 'Has ganado. Aunque la falta continúa.', 'Has acertado. ¿Te sientes satisfecho?']
+  };
+
+  // Mapa de qué clase de entrada usa cada imagen de Freud
+  const FREUD_CLASE = {
+    '3.png': 'freud-centro',
+    '4.png': 'freud-centro',
+    '5.png': 'freud-derecha',
+    '6.png': 'freud-centro',
+    '7.png': 'freud-centro',
+    '8.png': 'freud-izquierda',
+  };
+
+  function mostrarFreudError() {
+    resetearTimerPayasita();
+    const viejo = document.getElementById('mascota-freud');
+    if (viejo) viejo.remove();
+    const grupo = FREUD_ERRORES[Math.floor(Math.random() * FREUD_ERRORES.length)];
+    const frase = grupo.frases[Math.floor(Math.random() * grupo.frases.length)];
+    const clase = FREUD_CLASE[grupo.img] || 'freud-centro';
+    const el = document.createElement('div');
+    el.id = 'mascota-freud';
+    el.className = `mascota-freud ${clase}`;
+    el.innerHTML = `
+      <img src="imagenespaginalau/animacionesokcomp/${grupo.img.replace('.png','.webp')}" alt="Freud" class="mascota-img-freud">
+      <div class="mascota-globo mascota-globo-freud">${frase}</div>
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => el.classList.add('visible'), 50);
+    setTimeout(() => {
+      el.classList.remove('visible');
+      setTimeout(() => el.remove(), 600);
+    }, 3500);
+  }
+
+  function mostrarFreudAcierto() {
+    const viejo = document.getElementById('mascota-freud');
+    if (viejo) viejo.remove();
+    const frase = FREUD_ACIERTOS.frases[Math.floor(Math.random() * FREUD_ACIERTOS.frases.length)];
+    const el = document.createElement('div');
+    el.id = 'mascota-freud';
+    el.className = 'mascota-freud freud-izquierda';
+    el.innerHTML = `
+      <img src="imagenespaginalau/animacionesokcomp/8.webp" alt="Freud" class="mascota-img-freud">
+      <div class="mascota-globo mascota-globo-freud">${frase}</div>
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => el.classList.add('visible'), 50);
+    setTimeout(() => {
+      el.classList.remove('visible');
+      setTimeout(() => el.remove(), 600);
+    }, 4000);
+  }
+
+  /* -- HOMBRE GATO -- */
+  const FRASES_HOMBREGATO = [
+    'GENIAL!', 'ESPECTACULAR!', 'SABIA QUE LO HARIAS!',
+    'EY! PERO QUE DESTREZA!', 'ESE CEREBRITO ESTA CARGADO!',
+    'PERO ESTE SER ES UNA NAVE!', 'ESE ES MI TEAM!',
+    'PERO CLARO QUERIDA!', 'AHORA SI!',
+    'NOS VAMOS DE FIESTAAAAAAAAAA', 'AVISALE A POLAROIDDDDDDDDDDDD'
+  ];
+
+  function mostrarHombreGato() {
+    const viejo = document.getElementById('mascota-hombregato');
+    if (viejo) viejo.remove();
+    const frase = FRASES_HOMBREGATO[Math.floor(Math.random() * FRASES_HOMBREGATO.length)];
+    const el = document.createElement('div');
+    el.id = 'mascota-hombregato';
+    el.className = 'mascota-hombregato';
+    el.innerHTML = `
+      <div class="mascota-globo mascota-globo-gato">${frase}</div>
+      <img src="imagenespaginalau/animacionesokcomp/hombregato.webp" alt="hombre gato" class="mascota-img-gato">
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => el.classList.add('visible'), 50);
+    setTimeout(() => {
+      el.classList.remove('visible');
+      setTimeout(() => el.remove(), 600);
+    }, 4000);
+  }
+
+  /* -- HADITA (sigue el cursor) -- */
+  (function initHadita() {
+    const hadita = document.createElement('div');
+    hadita.id = 'hadita';
+    hadita.innerHTML = `<img src="imagenespaginalau/animacionesokcomp/priscila.webp" alt="" class="hadita-img"><canvas id="hadita-canvas" class="hadita-canvas"></canvas>`;
+    document.body.appendChild(hadita);
+
+    let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+    let hx = mx, hy = my;
+    const particulas = [];
+
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+
+    const canvas = document.getElementById('hadita-canvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    function crearParticula() {
+      particulas.push({
+        x: hx, y: hy,
+        vx: (Math.random() - 0.5) * 2,
+        vy: (Math.random() - 0.5) * 2 - 1,
+        vida: 1,
+        tam: Math.random() * 4 + 2,
+        color: ['#f9d4e8','#d4b8f0','#b8e0f0','#f0e6b8'][Math.floor(Math.random()*4)]
+      });
+    }
+
+    function animarHadita() {
+      hx += (mx - hx) * 0.06;
+      hy += (my - hy) * 0.06;
+      hadita.style.transform = `translate(${hx - 40}px, ${hy - 40}px)`;
+
+      if (Math.random() < 0.4) crearParticula();
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = particulas.length - 1; i >= 0; i--) {
+        const p = particulas[i];
+        p.x += p.vx; p.y += p.vy; p.vida -= 0.025;
+        if (p.vida <= 0) { particulas.splice(i, 1); continue; }
+        ctx.save();
+        ctx.globalAlpha = p.vida;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.tam * p.vida, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+      requestAnimationFrame(animarHadita);
+    }
+    animarHadita();
+  })();
 
   /* ════════════════════════════════════════
      ADIBONANZA
@@ -149,10 +385,14 @@
         okEl.classList.add('visible');
         errorEl.classList.remove('visible');
         inputEl.disabled = true;
+        mostrarFreudAcierto();
       } else {
         errorEl.textContent = errorAleatorio();
         errorEl.classList.add('visible');
         setTimeout(() => errorEl.classList.remove('visible'), 2000);
+        // al azar: Freud o payasita1
+        if (Math.random() < 0.5) mostrarFreudError();
+        else mostrarPayasita1();
       }
     }
 
@@ -259,16 +499,18 @@
         errorEl.classList.remove('visible');
         inputEl.disabled = true;
         btnConf.disabled = true;
+        mostrarFreudAcierto();
       } else {
         errorEl.textContent = errorAleatorio();
         errorEl.classList.add('visible');
         setTimeout(() => errorEl.classList.remove('visible'), 2000);
+        mostrarFreudError();
       }
     }
 
     btnConf.addEventListener('click', verificar);
     inputEl.addEventListener('keyup', e => { if (e.key === 'Enter') verificar(); });
-      inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); verificar(); } });
+    inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); verificar(); } });
   }
 
   /* ════════════════════════════════════════
@@ -279,7 +521,6 @@
     const porTirada     = DATOS.sopa.palabrasPorTirada || 5;
     const N             = DATOS.sopa.tamaño || 16;
 
-    // Elegir palabras al azar para esta tirada
     const shuffled = [...todasPalabras].sort(() => Math.random() - 0.5);
     const palabras  = shuffled.slice(0, porTirada);
 
@@ -315,7 +556,6 @@
 
     const grid = document.getElementById('sopa-grid');
 
-    // Mouse
     grid.addEventListener('mousedown', e => {
       if (!e.target.classList.contains('sopa-celda')) return;
       mouseDown = true;
@@ -338,7 +578,6 @@
       chequearCompleta(palabras, encontradas);
     });
 
-    // Touch
     grid.addEventListener('touchstart', e => {
       const cel = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
       if (!cel || !cel.classList.contains('sopa-celda')) return;
@@ -373,6 +612,8 @@
         el.innerHTML = `<div class="panel-respuesta-ok visible" style="margin-top:1rem;">
           ✓ ¡Encontraste todas!</div>${personitaHTML()}`;
       }
+      mostrarHombreGato();
+      mostrarFreudAcierto();
     }
   }
 
@@ -383,7 +624,6 @@
     const r1 = parseInt(celdas[celdas.length-1].dataset.r), c1 = parseInt(celdas[celdas.length-1].dataset.c);
     const dr = Math.sign(r1 - r0), dc = Math.sign(c1 - c0);
 
-    // Verificar que todas las celdas están en línea recta
     let enLinea = true;
     for (let i = 0; i < celdas.length; i++) {
       const r = parseInt(celdas[i].dataset.r), c = parseInt(celdas[i].dataset.c);
@@ -391,7 +631,7 @@
     }
     if (!enLinea) return;
 
-    const texto    = celdas.map(c => c.textContent).join('');
+    const texto     = celdas.map(c => c.textContent).join('');
     const textoNorm = normalizar(texto);
     const textoRev  = textoNorm.split('').reverse().join('');
 
@@ -408,11 +648,8 @@
 
   function generarSopa(palabras, N) {
     const grid = Array.from({ length: N }, () => Array(N).fill(''));
-    // 8 direcciones incluyendo diagonales
     const dirs = [[0,1],[1,0],[1,1],[0,-1],[-1,0],[-1,-1],[1,-1],[-1,1]];
     const letras = 'abcdefghijklmnopqrstuvwxyz';
-
-    // Ordenar por longitud descendente para colocar las más largas primero
     const ordenadas = [...palabras].sort((a, b) => b.length - a.length);
 
     ordenadas.forEach(p => {
@@ -482,9 +719,8 @@
     const btnIgual = document.getElementById('calc-igual');
     const btnReset = document.getElementById('calc-reset');
 
-    // Estado: construimos una expresión libre
     let expresion = '';
-    let digitosPulsados = 0; // para armar números de dos dígitos
+    let digitosPulsados = 0;
 
     function actualizarDisplay() {
       display.textContent = expresion || '_ _';
@@ -492,8 +728,7 @@
 
     document.querySelectorAll('.calculin-chip').forEach(btn => {
       btn.addEventListener('click', () => {
-        const d = btn.dataset.val;
-        expresion += d;
+        expresion += btn.dataset.val;
         digitosPulsados++;
         actualizarDisplay();
       });
@@ -520,12 +755,12 @@
       if (!expresion) return;
       let resultado;
       try {
-        // Reemplazar símbolos para eval
         const expr = expresion.replace(/×/g, '*').replace(/÷/g, '/');
         resultado = Math.round(eval(expr));
       } catch(e) {
         document.getElementById('calc-result').innerHTML =
           `<div class="panel-respuesta-error visible">Expresión inválida. Intentá de nuevo.</div>`;
+        mostrarPayasita1();
         return;
       }
 
@@ -534,6 +769,7 @@
         resEl.innerHTML = `<div class="resultado-hoja visible">
           <div class="resultado-hoja-titulo">Ese número está fuera del libro (pág. 31–373).</div>
           <div class="resultado-hoja-indice">Intentá otra combinación.</div></div>`;
+        mostrarPayasita1();
         return;
       }
 
@@ -543,6 +779,7 @@
       } else {
         resEl.innerHTML = resultadoHojaHTML(resultado, 'Hoja ' + resultado);
       }
+      mostrarHombreGato();
     });
   }
 
