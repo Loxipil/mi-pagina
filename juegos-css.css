@@ -878,3 +878,114 @@
   transform: translateX(-50%);
   border-top-color: var(--copper, #b8784a);
 }
+/* ═══════════════════════════════════
+   CORCHO DE COMENTARIOS
+═══════════════════════════════════ */
+.corcho-wrap {
+  width: 100%;
+  max-width: 860px;
+  margin: 4rem auto 0;
+  padding-top: 3rem;
+  border-top: 1px solid rgba(174,197,184,0.1);
+}
+.corcho-titulo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 300;
+  color: var(--smoke);
+  margin-bottom: 0.4rem;
+  text-align: center;
+}
+.corcho-bajada {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  color: var(--fog);
+  text-align: center;
+  margin-bottom: 2rem;
+  letter-spacing: 0.05em;
+}
+.corcho-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  max-width: 520px;
+  margin: 0 auto 3rem;
+}
+.corcho-input,
+.corcho-textarea {
+  background: var(--night);
+  border: 1px solid rgba(174,197,184,0.15);
+  color: var(--smoke);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  padding: 0.7rem 1rem;
+  outline: none;
+  resize: none;
+  transition: border-color 0.3s;
+}
+.corcho-input:focus,
+.corcho-textarea:focus { border-color: var(--copper); }
+.corcho-btn {
+  background: none;
+  border: 1px solid var(--copper);
+  color: var(--copper);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.6rem 1.4rem;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background 0.3s, color 0.3s;
+}
+.corcho-btn:hover { background: var(--copper); color: var(--night); }
+.corcho-aviso {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem;
+  color: var(--fog);
+  opacity: 0.6;
+  margin-top: -0.2rem;
+}
+.corcho-tablero {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  justify-content: center;
+  padding: 1rem 0 2rem;
+}
+.corcho-papelito {
+  background: rgba(184,120,74,0.07);
+  border: 1px solid rgba(184,120,74,0.2);
+  padding: 1rem 1.2rem;
+  max-width: 220px;
+  min-width: 160px;
+  position: relative;
+  animation: corcho-entra 0.4s ease both;
+}
+@keyframes corcho-entra {
+  from { opacity: 0; transform: translateY(10px) rotate(-1deg); }
+  to   { opacity: 1; transform: translateY(0) rotate(0deg); }
+}
+.corcho-papelito-autor {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: var(--copper);
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+.corcho-papelito-texto {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  color: var(--smoke);
+  line-height: 1.5;
+}
+.corcho-vacio {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  color: var(--fog);
+  font-size: 0.95rem;
+  text-align: center;
+  width: 100%;
+  padding: 1rem 0;
+}

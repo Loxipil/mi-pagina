@@ -784,3 +784,94 @@
   }
 
 })();
+/* ═══════════════════════════════════
+   CORCHO DE COMENTARIOS — Supabase
+═══════════════════════════════════ */
+(function () {
+  const SUPA_URL = 'https://pcqdzbufbligbobhuanb.supabase.co';
+  const SUPA_KEY = 'sb_publishable_gIDkoE9pcP-OLVjy6FpF1Q_sGnTvJRq';
+  const TABLA    = 'comentarios';
+
+  const tablero  = document.getElementById('corcho-tablero');
+  const btnEnv   = document.getElementById('corcho-enviar');
+  const inputAut = document.getElementById('corcho-autor');
+  const inputMsg = document.getElementById('corcho-mensaje');
+
+  if (!tablero) return;
+
+  async function cargarComentarios() {
+    try {
+      const res = await fetch(`${SUPA_URL}/rest/v1/${TABLA}?order=created_at.desc&limit=50`, {
+        headers: {
+          'apikey': SUPA_KEY,
+          'Authorization': 'Bearer ' + SUPA_KEY
+        }
+      });
+      const data = await res.json();
+      tablero.innerHTML = '';
+      if (!data.length) {
+        tablero.innerHTML = '<p class="corcho-vacio">Todavía no hay nada acá. Sé el primero.</p>';
+        return;
+      }
+      data.forEach(c => agregarPapelito(c, false));
+    } catch (e) {
+      console.warn('Error cargando comentarios:', e);
+    }
+  }
+
+  async function enviarComentario() {
+    const autor   = inputAut.value.trim() || 'Anónime';
+    const mensaje = inputMsg.value.trim();
+    if (!mensaje) return;
+
+    btnEnv.disabled = true;
+    btnEnv.textContent = 'Clavando...';
+
+    try {
+      const res = await fetch(`${SUPA_URL}/rest/v1/${TABLA}`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPA_KEY,
+          'Authorization': 'Bearer ' + SUPA_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify({ autor, mensaje })
+      });
+      const data = await res.json();
+      if (data && data[0]) {
+        agregarPapelito(data[0], true);
+        inputAut.value = '';
+        inputMsg.value = '';
+        const vacio = tablero.querySelector('.corcho-vacio');
+        if (vacio) vacio.remove();
+      }
+    } catch (e) {
+      console.warn('Error enviando comentario:', e);
+    }
+
+    btnEnv.disabled = false;
+    btnEnv.textContent = 'Clavar →';
+  }
+
+  function agregarPapelito(c, alInicio) {
+    const div = document.createElement('div');
+    div.className = 'corcho-papelito';
+    div.innerHTML = `
+      <p class="corcho-papelito-autor">${escHtml(c.autor || 'Anónime')}</p>
+      <p class="corcho-papelito-texto">${escHtml(c.mensaje)}</p>
+    `;
+    if (alInicio && tablero.firstChild) {
+      tablero.insertBefore(div, tablero.firstChild);
+    } else {
+      tablero.appendChild(div);
+    }
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  btnEnv.addEventListener('click', enviarComentario);
+  cargarComentarios();
+})();
