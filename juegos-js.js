@@ -1,8 +1,5 @@
-/* ═══════════════════════════════════════════════
    ORÁCULO CIENTÍFICO — JavaScript
-   Pegá esto ANTES del cierre </body>
-═══════════════════════════════════════════════ */
-
+  
 (function () {
   'use strict';
 
