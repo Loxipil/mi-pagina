@@ -992,16 +992,17 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
 /* --- HADITA --- */
 #hadita {
   position: fixed;
-  top: 0; left: 0;
-  width: 80px;
-  height: 80px;
+  bottom: 20px;
+  right: 20px;
+  width: 45px;
+  height: 45px;
   pointer-events: none;
   z-index: 9999;
-  will-change: transform;
+  animation: haditaFlota 3s ease-in-out infinite alternate;
 }
 .hadita-img {
-  width: 80px;
-  height: 80px;
+  width: 45px;
+  height: 45px;
   object-fit: contain;
   mix-blend-mode: screen;
   filter: drop-shadow(0 0 8px rgba(249,212,232,0.6))
@@ -1880,33 +1881,14 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
     }, 4000);
   }
 
-  /* -- HADITA (sigue el cursor) -- */
+/* -- HADITA (flotando fija abajo) -- */
   (function initHadita() {
     const hadita = document.createElement('div');
     hadita.id = 'hadita';
     hadita.innerHTML = `<img src="imagenespaginalau/animacionesokcomp/priscila.webp" alt="" class="hadita-img"><canvas id="hadita-canvas" class="hadita-canvas"></canvas>`;
     document.body.appendChild(hadita);
 
-    let mx = window.innerWidth / 2, my = window.innerHeight / 2;
-    let hx = mx, hy = my;
-    let wx = mx, wy = my;
-    let siguiendoCursor = false;
     const particulas = [];
-
-    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-
-function haditaNuevoDestino() {
-  wx = Math.random() * window.innerWidth;
-  wy = Math.random() * window.innerHeight;
-}
-haditaNuevoDestino();
-setInterval(haditaNuevoDestino, 6000);
-
-function haditaDecidirAcercarse() {
-  siguiendoCursor = Math.random() < 0.3;
-  setTimeout(() => { siguiendoCursor = false; }, 2500);
-}
-setInterval(haditaDecidirAcercarse, 8000);
 
     const canvas = document.getElementById('hadita-canvas');
     const ctx = canvas.getContext('2d');
@@ -1919,6 +1901,9 @@ setInterval(haditaDecidirAcercarse, 8000);
     window.addEventListener('resize', resizeCanvas);
 
     function crearParticula() {
+      const rect = hadita.getBoundingClientRect();
+      const hx = rect.left + rect.width / 2;
+      const hy = rect.top + rect.height / 2;
       particulas.push({
         x: hx, y: hy,
         vx: (Math.random() - 0.5) * 2,
@@ -1930,12 +1915,6 @@ setInterval(haditaDecidirAcercarse, 8000);
     }
 
     function animarHadita() {
-      const haditaTx = siguiendoCursor ? mx : wx;
-      const haditaTy = siguiendoCursor ? my : wy;
-      hx += (haditaTx - hx) * 0.04;
-      hy += (haditaTy - hy) * 0.04;
-      hadita.style.transform = `translate(${hx - 40}px, ${hy - 40}px)`;
-
       if (Math.random() < 0.4) crearParticula();
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
