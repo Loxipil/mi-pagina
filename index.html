@@ -956,6 +956,7 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
   .juego-panel { padding: 2rem 1.2rem; }
   .sopa-celda { width: 28px; height: 28px; font-size: 0.9rem; }
   .cuerdas-ecuacion { font-size: 1.5rem !important; }
+  .videos-musica { flex-direction: column !important; }
   .podcast-imgs { margin-top: 1rem !important; }
 }
 
@@ -994,18 +995,16 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
   position: fixed;
   bottom: 20px;
   right: 20px;
-  width: 45px;
-  height: 45px;
-  pointer-events: none;
+  width: 90px;
+  height: 90px;
   z-index: 9999;
   animation: haditaFlota 3s ease-in-out infinite alternate;
 }
 .hadita-img {
-  width: 45px;
-  height: 45px;
+  width: 90px;
+  height: 90px;
   object-fit: contain;
-  mix-blend-mode: screen;
-  filter: drop-shadow(0 0 8px rgba(249,212,232,0.6))
+  filter: none;
   animation: haditaFlota 3s ease-in-out infinite alternate;
 }
 @keyframes haditaFlota {
@@ -1339,6 +1338,18 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
   width: 100%;
   padding: 1rem 0;
 }
+/* --- MÍMICA GRÁFICA --- */
+.mimica-img-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+.mimica-img {
+  max-width: 260px;
+  max-height: 260px;
+  object-fit: contain;
+}
+
 </style>
 </head>
 <body>
@@ -1582,7 +1593,15 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
         <button class="juego-btn">Jugar</button>
       </div>
     </div>
-
+    <!-- 6. MÍMICA GRÁFICA -->
+    <div class="juego-card" data-juego="mimica">
+      <div class="juego-card-inner">
+        <span class="juego-numero">06</span>
+        <h3 class="juego-nombre">Mímica Gráfica</h3>
+        <p class="juego-desc">Una imagen. Una palabra escondida.</p>
+        <button class="juego-btn">Jugar</button>
+      </div>
+    </div>
   </div><!-- /juegos-grilla -->
 
   <!-- PANEL DE JUEGO (se llena dinámicamente) -->
@@ -1663,6 +1682,7 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
       case 'teoriacuerdas': renderTeoriaCuerdas(); break;
       case 'sopa':          renderSopa();          break;
       case 'calculin':      renderCalculin();      break;
+      case 'mimica':        renderMimica();        break;
     }
   }
 
@@ -1887,6 +1907,31 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
     hadita.id = 'hadita';
     hadita.innerHTML = `<img src="imagenespaginalau/animacionesokcomp/priscila.webp" alt="" class="hadita-img"><canvas id="hadita-canvas" class="hadita-canvas"></canvas>`;
     document.body.appendChild(hadita);
+    let haditaClicks = 0;
+    const haditaImg = hadita.querySelector('.hadita-img');
+    const haditaGlobo = document.createElement('div');
+    haditaGlobo.className = 'mascota-globo';
+    haditaGlobo.style.cssText = 'position:fixed;bottom:120px;right:20px;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none;';
+    document.body.appendChild(haditaGlobo);
+
+    function haditaDecirYAnimar(texto) {
+      haditaGlobo.textContent = texto;
+      haditaGlobo.style.opacity = '1';
+      haditaImg.classList.add('saltando');
+      setTimeout(() => haditaImg.classList.remove('saltando'), 400);
+      setTimeout(() => { haditaGlobo.style.opacity = '0'; }, 2200);
+    }
+
+    haditaImg.addEventListener('click', () => {
+      haditaClicks++;
+      if (haditaClicks === 1) haditaDecirYAnimar('¡Hola!');
+      else if (haditaClicks === 2) haditaDecirYAnimar('Emm... ¿qué pasó?');
+      else if (haditaClicks === 3) haditaDecirYAnimar('¿Querés que vuelva más tarde?');
+      else {
+        haditaClicks = 0;
+        window.open('https://www.youtube.com/@ArualAura?sub_confirmation=1', '_blank');
+      }
+    });
 
     const particulas = [];
 
@@ -2003,7 +2048,78 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
     });
     document.getElementById('adi-enviar').addEventListener('click', verificar);
   }
-
+  /* ════════════════════════════════════════
+     MÍMICA GRÁFICA
+  ════════════════════════════════════════ */
+  function renderMimica() {
+    if (!DATOS.mimica || DATOS.mimica.length === 0) {
+      abrirPanel(`<p class="panel-titulo">Mímica Gráfica</p>
+        <p style="font-family:'DM Sans',sans-serif;color:var(--fog);font-size:0.9rem;">
+          Este juego está en construcción. ¡Volvé pronto!
+        </p>`);
+      return;
+    }
+    const items = DATOS.mimica;
+    const item  = items[Math.floor(Math.random() * items.length)];
+    let errores = 0;
+ 
+    abrirPanel(`
+      <p class="panel-titulo">Mímica Gráfica</p>
+      <div class="mimica-img-wrap">
+        <img src="${item.imagen}" alt="Imagen del juego" class="mimica-img">
+      </div>
+      <div id="mimica-pista"></div>
+      <div class="panel-input-wrap">
+        <input class="panel-input" id="mimica-input" type="text" placeholder="Tu respuesta..." autocomplete="off">
+        <button class="panel-enviar-btn" id="mimica-enviar">Enviar →</button>
+      </div>
+      <div class="panel-respuesta-error" id="mimica-error"></div>
+      <div class="panel-respuesta-ok" id="mimica-ok"></div>
+      <div class="panel-deriva">¿Esta palabra está en el libro? <a href="#libro">Descubrilo.</a></div>
+    `);
+ 
+    const pistaEl = document.getElementById('mimica-pista');
+    const inputEl = document.getElementById('mimica-input');
+    const okEl    = document.getElementById('mimica-ok');
+    const errorEl = document.getElementById('mimica-error');
+ 
+    function mostrarPista() {
+      const p = document.createElement('div');
+      p.className = 'panel-pista';
+      p.textContent = item.pista;
+      pistaEl.appendChild(p);
+      setTimeout(() => p.classList.add('visible'), 50);
+    }
+ 
+    function verificar() {
+      const val  = normalizar(inputEl.value);
+      const resp = normalizar(item.respuesta);
+      if (!val) return;
+      if (val === resp) {
+        okEl.textContent = '✓ ' + item.respuesta.toUpperCase();
+        okEl.classList.add('visible');
+        errorEl.classList.remove('visible');
+        inputEl.disabled = true;
+        mostrarFreudAcierto();
+      } else {
+        errores++;
+        errorEl.textContent = errorAleatorio();
+        errorEl.classList.add('visible');
+        setTimeout(() => errorEl.classList.remove('visible'), 2000);
+        if (errores === 2) mostrarPista();
+        if (Math.random() < 0.5) mostrarFreudError();
+        else mostrarPayasita1();
+      }
+    }
+ 
+    inputEl.addEventListener('keyup', e => { if (e.key === 'Enter') verificar(); });
+    inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); verificar(); } });
+    inputEl.addEventListener('input', () => {
+      if (normalizar(inputEl.value) === normalizar(item.respuesta)) verificar();
+    });
+    document.getElementById('mimica-enviar').addEventListener('click', verificar);
+  }
+ 
   /* ════════════════════════════════════════
      VEO VEO
   ════════════════════════════════════════ */
@@ -2547,7 +2663,7 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
 <div class="divider"></div>
 
 <!-- HIPÓTESIS -->
-<section class="hipotesis" id="hipotesis" aria-labelledby="hipotesis-titulo">
+<section class="hipotesis" id="hipotesis" aria-labelledby="hipotesis-titulo" style="position:relative;overflow:hidden">
 <span class="sub-word" style="left:15.9%;top:29.6%;" data-word="1">protocolo</span>
 <span class="sub-word" style="left:69.3%;top:9.7%;" data-word="1">método</span>
 <span class="sub-word" style="left:16.2%;top:84.7%;" data-word="1">anécdota</span>
@@ -2709,10 +2825,14 @@ function loxiPrev(){if(LX>0){LX--;LR();}}
         <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:0.97rem;color:var(--fog);line-height:1.8">Hay algunos discos durmiendo en la PC que no quieren salir todavía. Estamos respetando el proceso.</p>
       </div>
     </div>
-    <div style="margin-top:2rem;display:flex;flex-direction:row;gap:1rem">
+    <div class="videos-musica" style="margin-top:2rem;display:flex;flex-direction:row;gap:1rem;flex-wrap:wrap">
   <iframe width="100%" height="180" src="https://www.youtube.com/embed/JR6QdFN4Fas" frameborder="0" allowfullscreen style="border-radius:6px"></iframe>
   <iframe width="100%" height="180" src="https://www.youtube.com/embed/pZPHzZAY-gw" frameborder="0" allowfullscreen style="border-radius:6px"></iframe>
   <iframe width="100%" height="180" src="https://www.youtube.com/embed/Xz91RYDizB8" frameborder="0" allowfullscreen style="border-radius:6px"></iframe>
+  <iframe width="100%" height="180" src="https://www.youtube.com/embed/BjPmT_NOTCE" frameborder="0" allowfullscreen style="border-radius:6px"></iframe>
+</div>
+<div style="margin-top:1.2rem;text-align:center">
+  <a href="https://www.youtube.com/@ArualAura?sub_confirmation=1" target="_blank" rel="noopener" class="btn btn-primary">Suscribite al canal</a>
 </div>
     <div class="musica-img reveal-slow" style="display:flex;flex-direction:row;gap:1rem;align-items:flex-start">
       <img src="imagenespaginalau/aa.jpg" alt="Arual Aura" style="max-width:50%;border-radius:6px">
@@ -2765,7 +2885,7 @@ function loxiPrev(){if(LX>0){LX--;LR();}}
     </div>
     <div class="ceremonia-content reveal-slow">
       <h2 id="ceremonia-titulo">La ceremonia<em>del té</em></h2>
-      <p class="ceremonia-desc">Un espacio de encuentro. Lecturas compartidas, conversaciones sobre psicoanálisis y escritura, presencias que escuchan. Dejá tu correo y te aviso cuando hay función.</p>
+      <p class="ceremonia-desc">Un espacio de encuentro. Lecturas compartidas, conversaciones, expresión creativa, escritura, experiencias, relatos sobre lo que nos pasa, presencias que escuchan. Dejá tu correo y te aviso cuando nos juntamos.</p>
       <div class="email-form">
         <input type="email" class="email-input" placeholder="tu@correo.com" aria-label="Tu correo electrónico">
         <a href="mailto:beraldilaurasol@gmail.com?subject=Quiero unirme a La ceremonia del té — Laura Beraldi" class="btn btn-primary">Sumarme</a>
