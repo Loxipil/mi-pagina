@@ -82,6 +82,98 @@
     }
   ],
   "veoveo": [],
+  "mimica": [
+    {
+      "imagen": "imagenespaginalau/imagenesjuegos/amor.webp",
+      "respuesta": "amor",
+      "pista": "Roma fue una de las cunas de este sentimiento invertido."
+    },
+    {
+      "imagen": "imagenespaginalau/imagenesjuegos/cuerpo.webp",
+      "respuesta": "cuerpo",
+      "pista": "Nuestro lienzo inigualable."
+    },
+    {
+      "imagen": "imagenespaginalau/imagenesjuegos/herida.webp",
+      "respuesta": "herida",
+      "pista": "Recordatorio de un tramo de la experiencia."
+    },
+    {
+      "imagen": "imagenespaginalau/imagenesjuegos/huella.webp",
+      "respuesta": "huella",
+      "pista": "Pista."
+    },
+    {
+      "imagen": "imagenespaginalau/imagenesjuegos/imagen.webp",
+      "respuesta": "imagen",
+      "pista": "Puede ser un dibujo."
+    },
+    {
+      "imagen": "imagenespaginalau/imagenesjuegos/ley.webp",
+      "respuesta": "ley",
+      "pista": "Aparece, tal vez, junto al orden."
+    },
+    {
+      "imagen": "imagenespaginalau/imagenesjuegos/mirada.webp",
+      "respuesta": "mirada",
+      "pista": "Habla sin palabras."
+    },
+    {
+      "imagen": "imagenespaginalau/imagenesjuegos/pausa.webp",
+      "respuesta": "pausa",
+      "pista": "Entre la acción y el freno."
+    },
+    {
+      "imagen": "imagenespaginalau/imagenesjuegos/rastro.webp",
+      "respuesta": "rastro",
+      "pista": "Indicio."
+    },
+    {
+      "imagen": "imagenespaginalau/imagenesjuegos/retrato.webp",
+      "respuesta": "retrato",
+      "pista": "Interpretación gráfica."
+    },
+    {
+      "imagen": "imagenespaginalau/imagenesjuegos/rol.webp",
+      "respuesta": "rol",
+      "pista": "Puesto de acción."
+    },
+    {
+      "imagen": "imagenespaginalau/imagenesjuegos/silencio.webp",
+      "respuesta": "silencio",
+      "pista": "Dicen que otorga, pero eso puede ser falso."
+    },
+    {
+      "imagen": "imagenespaginalau/imagenesjuegos/sombra.webp",
+      "respuesta": "sombra",
+      "pista": "La obsesión puede lograr que una persona se convierta en la del otro."
+    },
+    {
+      "imagen": "imagenespaginalau/imagenesjuegos/sueño.webp",
+      "respuesta": "sueño",
+      "pista": "Lo que tú tienes conmigo, cariñito."
+    },
+    {
+      "imagen": "imagenespaginalau/imagenesjuegos/tiempo.webp",
+      "respuesta": "tiempo",
+      "pista": "Pensamos que está pero cuando quiere se va, como escorpio cuando se da cuenta de tu traición."
+    },
+    {
+      "imagen": "imagenespaginalau/imagenesjuegos/umbral.webp",
+      "respuesta": "umbral",
+      "pista": "Dicen que se atraviesa para llegar al otro lado."
+    },
+    {
+      "imagen": "imagenespaginalau/imagenesjuegos/voz.webp",
+      "respuesta": "voz",
+      "pista": "El espíritu toma esta forma."
+    },
+    {
+      "imagen": "imagenespaginalau/imagenesjuegos/player.webp",
+      "respuesta": "player",
+      "pista": "Jugador."
+    }
+  ],
   "teoriacuerdas": [
     {
       "ecuacion": "(X + 12) × 2 = 314",
