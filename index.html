@@ -54,7 +54,7 @@ body{background:var(--night);color:var(--smoke);font-family:'DM Sans',sans-serif
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.4;mix-blend-mode:overlay;}
 
 /* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:1.3rem 2rem;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(to bottom,rgba(12,14,13,0.97) 0%,transparent 100%);}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:1.3rem 2rem;background:var(--night);display:flex;justify-content:space-between;align-items:center;background:linear-gradient(to bottom,rgba(12,14,13,0.97) 0%,transparent 100%);}
 .nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.1rem;letter-spacing:0.08em;color:var(--paper);text-decoration:none;font-style:italic;}
 .nav-links{display:flex;gap:1.6rem;list-style:none;}
 .nav-links a{font-size:0.63rem;letter-spacing:0.2em;color:var(--fog);text-decoration:none;text-transform:uppercase;transition:color 0.3s;}
@@ -956,6 +956,7 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
   .juego-panel { padding: 2rem 1.2rem; }
   .sopa-celda { width: 28px; height: 28px; font-size: 0.9rem; }
   .cuerdas-ecuacion { font-size: 1.5rem !important; }
+  .podcast-imgs { margin-top: 1rem !important; }
 }
 
 /* --- BOTÓN ENVIAR INLINE --- */
@@ -1690,13 +1691,7 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
   }
 
   function personitaHTML() {
-    const acciones = ['bailando', 'pintando', 'escribiendo', 'musica', 'cortando'];
-    const accion = acciones[Math.floor(Math.random() * acciones.length)];
-    return `<div class="personita-wrap"><div class="personita ${accion}" aria-hidden="true">
-      <div class="p-cabeza"></div><div class="p-cuerpo"></div>
-      <div class="p-brazo i"></div><div class="p-brazo d"></div>
-      <div class="p-pierna i"></div><div class="p-pierna d"></div>
-    </div></div>`;
+    return '';
   }
 
   function resultadoHojaHTML(numero, titulo) {
@@ -1725,7 +1720,7 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
 
   function iniciarTimerPayasita() {
     limpiarTimerPayasita();
-    timerPayasita = setTimeout(() => mostrarPayasita2(), 20000); // 20 segundos
+    timerPayasita = setTimeout(() => mostrarPayasita2(), 120000); // 2 minutos
   }
 
   function resetearTimerPayasita() {
@@ -1894,9 +1889,24 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
 
     let mx = window.innerWidth / 2, my = window.innerHeight / 2;
     let hx = mx, hy = my;
+    let wx = mx, wy = my;
+    let siguiendoCursor = false;
     const particulas = [];
 
     document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+
+function haditaNuevoDestino() {
+  wx = Math.random() * window.innerWidth;
+  wy = Math.random() * window.innerHeight;
+}
+haditaNuevoDestino();
+setInterval(haditaNuevoDestino, 6000);
+
+function haditaDecidirAcercarse() {
+  siguiendoCursor = Math.random() < 0.3;
+  setTimeout(() => { siguiendoCursor = false; }, 2500);
+}
+setInterval(haditaDecidirAcercarse, 8000);
 
     const canvas = document.getElementById('hadita-canvas');
     const ctx = canvas.getContext('2d');
@@ -1920,8 +1930,10 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
     }
 
     function animarHadita() {
-      hx += (mx - hx) * 0.06;
-      hy += (my - hy) * 0.06;
+      const haditaTx = siguiendoCursor ? mx : wx;
+      const haditaTy = siguiendoCursor ? my : wy;
+      hx += (haditaTx - hx) * 0.04;
+      hy += (haditaTy - hy) * 0.04;
       hadita.style.transform = `translate(${hx - 40}px, ${hy - 40}px)`;
 
       if (Math.random() < 0.4) crearParticula();
@@ -2460,7 +2472,7 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
     }
 
     btnEnv.disabled = false;
-    btnEnv.textContent = 'Clavar →';
+    btnEnv.textContent = 'Post it';
   }
 
   function agregarPapelito(c, alInicio) {
@@ -2519,7 +2531,7 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
       </div>
       
     </div>
-    <div class="reveal-slow" style="align-self:flex-start;margin-top:-09rem">
+    <div class="reveal-slow podcast-imgs" style="align-self:flex-start;margin-top:-09rem">
       <div class="podcast-cover">
         <img src="imagenespaginalau/buho.jpg">
       </div>
@@ -2604,7 +2616,7 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
       <form class="corcho-form" id="corcho-form" onsubmit="return false;">
         <input class="corcho-input" id="corcho-autor" type="text" placeholder="Tu nombre (opcional)" maxlength="60" autocomplete="off">
         <textarea class="corcho-textarea" id="corcho-mensaje" placeholder="¿Qué querés dejar acá?" maxlength="300" rows="3"></textarea>
-        <button class="corcho-btn" id="corcho-enviar">Clavar →</button>
+        <button class="corcho-btn" id="corcho-enviar">Post it</button>
         <p class="corcho-aviso">Al comentar aceptás que tu mensaje sea visible para todos.</p>
       </form>
 
