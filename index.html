@@ -985,7 +985,97 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
   transition: opacity 0.2s;
 }
 .panel-enviar-btn:hover { opacity: 0.85; }
-
+/* --- CORCHO DE COMENTARIOS --- */
+.corcho-wrap {
+  background: #8b6f47;
+  background-image: radial-gradient(circle at 20% 30%, rgba(0,0,0,0.15) 1px, transparent 1px),
+                     radial-gradient(circle at 70% 60%, rgba(0,0,0,0.12) 1px, transparent 1px),
+                     radial-gradient(circle at 45% 85%, rgba(0,0,0,0.1) 1px, transparent 1px);
+  background-size: 18px 18px, 22px 22px, 16px 16px;
+  border: 10px solid #5c4a32;
+  padding: 2rem;
+  margin: 2rem auto;
+  max-width: 700px;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.3);
+}
+.corcho-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  background: rgba(255,255,255,0.92);
+  padding: 1.2rem;
+  box-shadow: 2px 3px 6px rgba(0,0,0,0.3);
+  transform: rotate(-0.5deg);
+}
+.corcho-input, .corcho-textarea {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  border: 1px solid rgba(0,0,0,0.15);
+  padding: 0.6rem;
+  background: #fffdf7;
+  color: #333;
+}
+.corcho-btn {
+  background: var(--copper);
+  border: none;
+  color: var(--night);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  align-self: flex-start;
+}
+.corcho-aviso { font-size: 0.7rem; color: #888; }
+.corcho-tablero {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  margin-top: 2rem;
+  justify-content: center;
+}
+.corcho-papelito {
+  width: 160px;
+  padding: 1rem 1rem 1.4rem;
+  font-family: 'Cormorant Garamond', serif;
+  box-shadow: 2px 3px 8px rgba(0,0,0,0.35);
+  position: relative;
+}
+.corcho-papelito:nth-child(5n+1) { background: #fff4a3; transform: rotate(-2deg); }
+.corcho-papelito:nth-child(5n+2) { background: #ffc8dd; transform: rotate(1.5deg); }
+.corcho-papelito:nth-child(5n+3) { background: #a3e4d7; transform: rotate(-1deg); }
+.corcho-papelito:nth-child(5n+4) { background: #c3b1e1; transform: rotate(2deg); }
+.corcho-papelito:nth-child(5n+5) { background: #ffd6a5; transform: rotate(-1.5deg); }
+.corcho-papelito::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #c0392b;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+.corcho-papelito-autor {
+  font-size: 0.75rem;
+  font-style: italic;
+  color: #555;
+  margin-bottom: 0.3rem;
+}
+.corcho-papelito-texto {
+  font-size: 0.95rem;
+  color: #222;
+  line-height: 1.3;
+}
+.corcho-vacio {
+  color: rgba(255,255,255,0.6);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  text-align: center;
+}
 /* ═══════════════════════════════════════════════
    MASCOTAS ANIMADAS
 ═══════════════════════════════════════════════ */
@@ -1583,7 +1673,15 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
         <button class="juego-btn">Jugar</button>
       </div>
     </div>
-
+    <!-- 6. MÍMICA GRÁFICA -->
+    <div class="juego-card" data-juego="mimica">
+      <div class="juego-card-inner">
+        <span class="juego-numero">06</span>
+        <h3 class="juego-nombre">Mímica Gráfica</h3>
+        <p class="juego-desc">Una imagen, una palabra escondida.</p>
+        <button class="juego-btn">Jugar</button>
+      </div>
+    </div>
     <!-- 5. CALCULÍN -->
     <div class="juego-card" data-juego="calculin">
       <div class="juego-card-inner">
@@ -1593,17 +1691,7 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
         <button class="juego-btn">Jugar</button>
       </div>
     </div>
-    <!-- 6. MÍMICA GRÁFICA -->
-    <div class="juego-card" data-juego="mimica">
-      <div class="juego-card-inner">
-        <span class="juego-numero">06</span>
-        <h3 class="juego-nombre">Mímica Gráfica</h3>
-        <p class="juego-desc">Una imagen. Una palabra escondida.</p>
-        <button class="juego-btn">Jugar</button>
-      </div>
-    </div>
-  </div><!-- /juegos-grilla -->
-
+    
   <!-- PANEL DE JUEGO (se llena dinámicamente) -->
   <div class="juego-panel" id="juego-panel" aria-live="polite" hidden>
     <button class="juego-panel-cerrar" id="juego-cerrar" aria-label="Cerrar juego">✕</button>
@@ -2698,16 +2786,11 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
       <img src="imagenespaginalau/acheral.jpeg" style="width:100%;height:400px;object-fit:cover">
     </div>
     <div class="hipotesis-join reveal">
-      <p class="hipotesis-join-text">¿Vos qué creés? ¿Es posible?<br><br>En los episodios del podcast también tenés la sección de comentarios. Interactuá, que está para vos.</p>
-      <a href="https://substack.com/@loxipil" target="_blank" rel="noopener" class="btn btn-primary">Sumarte a la conversación</a>
-      <p class="hipotesis-join-note">En Substack podés comentar con tu nombre. Tu privacidad es tuya.</p>
+<p class="hipotesis-join-text">¿Vos qué creés? ¿Es posible?<br><br>Interactuá, que está para vos.</p>
     </div>
 
     <!-- CORCHO DE COMENTARIOS -->
     <div class="corcho-wrap reveal" id="corcho">
-      <h3 class="corcho-titulo">El pizarrón</h3>
-      <p class="corcho-bajada">Dejá tu huella. Se queda acá.</p>
-
       <form class="corcho-form" id="corcho-form" onsubmit="return false;">
         <input class="corcho-input" id="corcho-autor" type="text" placeholder="Tu nombre (opcional)" maxlength="60" autocomplete="off">
         <textarea class="corcho-textarea" id="corcho-mensaje" placeholder="¿Qué querés dejar acá?" maxlength="300" rows="3"></textarea>
@@ -2744,7 +2827,7 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
 let LI=[],LX=0;
 fetch('https://api.rss2json.com/v1/api.json?rss_url=https://loxipil.substack.com/feed')
 .then(r=>r.json()).then(d=>{LI=d.items;LR();});
-function LR(){if(!LI.length)return;const i=LI[LX],t=i.description.replace(/<[^>]+>/g,'').slice(0,300);document.getElementById('loxi-feed').innerHTML=`<article class="bonus-item">${i.thumbnail?`<img src="${i.thumbnail}" style="width:100%;max-height:200px;object-fit:cover;margin-bottom:1rem">`:''}<p class="bonus-label">${i.pubDate.slice(0,10)}</p><h3 style="color:var(--copper)">${i.title}</h3><p class="bonus-text">${t}...</p><a href="${i.link}" target="_blank" class="btn btn-ghost">Leer completo</a></article>`;}
+function LR(){if(!LI.length)return;const i=LI[LX],t=i.description.replace(/<[^>]+>/g,'').slice(0,300);const imgMatch=i.description.match(/<img[^>]+src="([^"]+)"/);const img=i.thumbnail||(imgMatch?imgMatch[1]:'');document.getElementById('loxi-feed').innerHTML=`<article class="bonus-item">${img?`<img src="${img}" style="width:100%;max-height:200px;object-fit:cover;margin-bottom:1rem">`:''}<p class="bonus-label">${i.pubDate.slice(0,10)}</p><h3 style="color:var(--copper)">${i.title}</h3><p class="bonus-text">${t}...</p><a href="${i.link}" target="_blank" class="btn btn-ghost">Leer completo</a></article>`;}
 function loxiNext(){if(LX<LI.length-1){LX++;LR();}}
 function loxiPrev(){if(LX>0){LX--;LR();}}
 </script>
