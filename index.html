@@ -18,7 +18,7 @@
 <meta property="og:image:alt" content="Laura Beraldi — Artista Temporal">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://lauraberaldi.com/og-image.jpg">
-<link rel="canonical" href="https://lauraberaldi.com">
+<link rel="canonical" href="https://lauraberaldi.com.ar">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <script type="application/ld+json">
@@ -2021,6 +2021,37 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
         window.open('https://www.youtube.com/@ArualAura?sub_confirmation=1', '_blank');
       }
     });
+    let arrastrando = false;
+    let offsetX = 0, offsetY = 0;
+
+    function empezarArrastre(x, y) {
+      arrastrando = true;
+      const rect = hadita.getBoundingClientRect();
+      offsetX = x - rect.left;
+      offsetY = y - rect.top;
+      hadita.style.transition = 'none';
+    }
+    function moverArrastre(x, y) {
+      if (!arrastrando) return;
+      hadita.style.left = (x - offsetX) + 'px';
+      hadita.style.top = (y - offsetY) + 'px';
+      hadita.style.bottom = 'auto';
+      hadita.style.right = 'auto';
+    }
+    function terminarArrastre() {
+      if (!arrastrando) return;
+      arrastrando = false;
+      hadita.style.transition = '';
+      haditaDecirYAnimar('¡Ey!!');
+    }
+
+    haditaImg.addEventListener('mousedown', e => { empezarArrastre(e.clientX, e.clientY); e.preventDefault(); });
+    document.addEventListener('mousemove', e => moverArrastre(e.clientX, e.clientY));
+    document.addEventListener('mouseup', terminarArrastre);
+
+    haditaImg.addEventListener('touchstart', e => { const t = e.touches[0]; empezarArrastre(t.clientX, t.clientY); }, {passive:true});
+    document.addEventListener('touchmove', e => { const t = e.touches[0]; moverArrastre(t.clientX, t.clientY); }, {passive:true});
+    document.addEventListener('touchend', terminarArrastre);
 
     const particulas = [];
 
@@ -2713,8 +2744,14 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
       <div style="margin-top:1.2rem">
         <a href="https://open.spotify.com/episode/6TbgkxKKqK11rUdqYQebXF" target="_blank" rel="noopener" class="btn btn-ghost">Ver todos los episodios</a>
       </div>
-      
-    </div>
+      <div style="margin-top:0.8rem;display:flex;flex-wrap:wrap;gap:0.6rem;">
+          <a href="https://www.youtube.com/playlist?list=PLsxQKs2WysjqAvgAkSWz41JB01Ft-b8Wt" target="_blank" rel="noopener" class="platform-link"><span>YouTube</span></a>
+          <a href="https://www.ivoox.com/podcast-practica-para-analistas-escrito-paciente_sq_f13183726_amp_1.html" target="_blank" rel="noopener" class="platform-link"><span>iVoox</span></a>
+          <a href="https://tunein.com/radio/p4763137" target="_blank" rel="noopener" class="platform-link"><span>TuneIn</span></a>
+          <a href="https://podcasts.apple.com/us/podcast/pr%C3%A1ctica-para-analistas-un-libro-sobre-psicoan%C3%A1lisis/id6785112512" target="_blank" rel="noopener" class="platform-link"><span>Apple Podcasts</span></a>      
+          <a href="https://music.amazon.com/podcasts/e781ab4f-c3a0-4094-ad43-97ff08d2aee6/pr%C3%A1ctica-para-analistas-un-libro-sobre-psicoan%C3%A1lisis-escrito-por-una-paciente" target="_blank" rel="noopener" class="platform-link"><span>Amazon Music</span></a>
+      </div>
+      </div> 
     <div class="reveal-slow podcast-imgs" style="align-self:flex-start;margin-top:-09rem">
       <div class="podcast-cover">
         <img src="imagenespaginalau/buho.jpg">
@@ -2895,7 +2932,7 @@ function loxiPrev(){if(LX>0){LX--;LR();}}
           <span>YouTube — Arual Aura / Laura Beraldi</span>
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
         </a>
-        <a href="https://open.spotify.com/search/Arual%20Aura" target="_blank" rel="noopener" class="platform-link">
+        <a href="https://open.spotify.com/artist/0ovFtoW1aN0e7iAOGO1Fog" target="_blank" rel="noopener" class="platform...">
           <span>Spotify — Arual Aura</span>
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
         </a>
