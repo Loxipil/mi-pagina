@@ -1860,7 +1860,7 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
       el.classList.remove('visible');
       setTimeout(() => el.remove(), 600);
       resetearTimerPayasita();
-    }, 4000);
+    }, 6000);
   }
 
   function limpiarMascotas() {
@@ -1894,7 +1894,7 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
     setTimeout(() => {
       el.classList.remove('visible');
       setTimeout(() => el.remove(), 600);
-    }, 3500);
+    }, 5000);
   }
 
   /* -- FREUD -- */
@@ -1940,7 +1940,7 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
     setTimeout(() => {
       el.classList.remove('visible');
       setTimeout(() => el.remove(), 600);
-    }, 3500);
+    }, 6000);
   }
 
   function mostrarFreudAcierto() {
@@ -1959,7 +1959,7 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
     setTimeout(() => {
       el.classList.remove('visible');
       setTimeout(() => el.remove(), 600);
-    }, 4000);
+    }, 6000);
   }
 
   /* -- HOMBRE GATO -- */
@@ -1987,7 +1987,7 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
     setTimeout(() => {
       el.classList.remove('visible');
       setTimeout(() => el.remove(), 600);
-    }, 4000);
+    }, 6000);
   }
 
 /* -- HADITA (flotando fija abajo) -- */
@@ -2221,6 +2221,12 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
         errorEl.classList.remove('visible');
         inputEl.disabled = true;
         mostrarFreudAcierto();
+        const btnSiguiente = document.createElement('button');
+        btnSiguiente.className = 'juego-btn';
+        btnSiguiente.style.marginTop = '1rem';
+        btnSiguiente.textContent = 'Siguiente →';
+        btnSiguiente.addEventListener('click', renderMimica);
+        okEl.parentNode.appendChild(btnSiguiente);
       } else {
         errores++;
         errorEl.textContent = errorAleatorio();
@@ -2358,9 +2364,9 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
     const N             = DATOS.sopa.tamaño || 16;
 
     const shuffled = [...todasPalabras].sort(() => Math.random() - 0.5);
-    const palabras  = shuffled.slice(0, porTirada);
+    const elegidas  = shuffled.slice(0, porTirada);
 
-    const grilla     = generarSopa(palabras, N);
+    const { grid: grilla, colocadas: palabras } = generarSopa(elegidas, N);
     const encontradas = new Set();
     let seleccion = [];
     let mouseDown = false;
@@ -2487,7 +2493,7 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
     const dirs = [[0,1],[1,0],[1,1],[0,-1],[-1,0],[-1,-1],[1,-1],[-1,1]];
     const letras = 'abcdefghijklmnopqrstuvwxyz';
     const ordenadas = [...palabras].sort((a, b) => b.length - a.length);
-
+    const colocadas = [];
     ordenadas.forEach(p => {
       const pal = normalizar(p);
       let colocada = false, intentos = 0;
@@ -2507,6 +2513,7 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
         if (ok) {
           for (let i = 0; i < pal.length; i++) grid[r + dr*i][c + dc*i] = pal[i];
           colocada = true;
+          colocadas.push(p);
         }
       }
     });
@@ -2515,7 +2522,7 @@ footer p{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:
       for (let c = 0; c < N; c++)
         if (grid[r][c] === '') grid[r][c] = letras[Math.floor(Math.random() * letras.length)];
 
-    return grid;
+    return { grid, colocadas };
   }
 
   /* ════════════════════════════════════════
